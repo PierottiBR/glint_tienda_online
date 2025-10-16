@@ -1,39 +1,13 @@
 import streamlit as st
 import base64
 
-st.set_page_config(page_title="Glint Accesorios", page_icon=":stars:", layout="wide")
 
 # === Cargar imagen PNG y convertir a base64 ===
 logo_path = "GlintAccesoriosLogo.png"  # tu imagen
 with open(logo_path, "rb") as f:
     logo_base64 = base64.b64encode(f.read()).decode()
 
-# === Mostrar logo centrado ===
-st.markdown(
-    f"""
-    <style>
-        .contenedor {{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: transparent !important;
-        }}
-        .imagen-banner {{
-            width: 30%;
-            height: auto;
-            background-color: transparent !important;
-        }}
-        /* Quitar fondo oscuro general */
-        [data-testid="stAppViewContainer"] {{
-            background-color: Black !important;
-        }}
-    </style>
-    <div class="contenedor">
-        <img src="data:image/png;base64,{logo_base64}" class="imagen-banner" alt="banner">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.set_page_config(page_title="Glint Accesorios", page_icon=logo_path, layout="wide")
 
 # === Mostrar título sin clamp ni ícono ===
 st.markdown(
