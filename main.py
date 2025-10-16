@@ -13,21 +13,40 @@ st.set_page_config(page_title="Glint Accesorios", page_icon=logo_path, layout="w
 st.markdown(
     """
     <style>
-    @keyframes glow {
+    @keyframes star-glow {
         0% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
         50% { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700; }
         100% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
     }
-    .titulo-animado {
+
+    .titulo-glint {
         text-align: center;
         color: #d4af37;
         font-weight: 800;
-        font-size: 2.5rem;
+        font-size: 3rem;  /* más grande */
         margin-top: 15px;
-        animation: glow 1.5s infinite;
+    }
+
+    .estrella {
+        display: block;
+        font-size: 3.5rem; /* estrella más grande */
+        animation: star-glow 1.5s infinite;
+        margin: 0 auto;
+    }
+
+    .subtitulo {
+        text-align: center;
+        color: #d4af37;
+        font-size: 1.5rem;
+        margin-top: -10px;
+        letter-spacing: 2px;
     }
     </style>
-    <p class="titulo-animado">Glint Accesorios</p>
+
+    <p class="subtitulo">Bienvenid@ a</p>
+    <p class="estrella">★</p>
+    <p class="titulo-glint">Glint</p>
+    <p class="subtitulo">ACCESORIOS</p>
     """,
     unsafe_allow_html=True
 )
