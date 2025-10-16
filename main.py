@@ -92,11 +92,11 @@ with col1:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_cubanos")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"], use_container_width=True)
+        st.image(img, caption=prod["nombre"], width='stretch')
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+        st.link_button(label="Comprar", url=prod["url"],width='stretch')
 
 # Columna 2
 with col2:
@@ -104,11 +104,11 @@ with col2:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_flor")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],use_container_width=True)
+        st.image(img, caption=prod["nombre"],width='stretch')
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+        st.link_button(label="Comprar", url=prod["url"],width='stretch')
 
 # Columna 3
 with col3:
@@ -116,8 +116,8 @@ with col3:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_cereza")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],use_container_width=True)
+        st.image(img, caption=prod["nombre"],width='stretch')
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+        st.link_button(label="Comprar", url=prod["url"],width='stretch')
