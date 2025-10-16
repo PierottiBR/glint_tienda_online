@@ -92,7 +92,7 @@ with col1:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_cubanos")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"], width='stretch')
+        st.image(img, caption=prod["nombre"])
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
@@ -104,7 +104,7 @@ with col2:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_flor")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],width='stretch')
+        st.image(img, caption=prod["nombre"])
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
@@ -116,7 +116,7 @@ with col3:
     with contenedor:
         prod = next(p for p in productos if p["id"] == "aros_cereza")
         img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],width='stretch')
+        st.image(img, caption=prod["nombre"])
         st.write(f"**{prod['nombre']}**")
         for detalle in prod["detalles"]:
             st.write(detalle)
