@@ -38,9 +38,22 @@ st.markdown(
 # === Mostrar título sin clamp ni ícono ===
 st.markdown(
     """
-    <p style='text-align: center; color: #d4af37; font-weight: 800; font-size: 2rem; margin-top: 15px;'>
-        Glint Accesorios
-    </p>
+    <style>
+    @keyframes glow {
+        0% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
+        50% { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700; }
+        100% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
+    }
+    .titulo-animado {
+        text-align: center;
+        color: #d4af37;
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-top: 15px;
+        animation: glow 1.5s infinite;
+    }
+    </style>
+    <p class="titulo-animado">Glint Accesorios</p>
     """,
     unsafe_allow_html=True
 )
