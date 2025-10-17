@@ -23,33 +23,33 @@ st.markdown(
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0; /* elimina márgenes verticales extra */
+        margin: 0; /* elimina márgenes extra */
     }
 
     .titulo-glint {
         color: #d4af37;
         font-weight: 900;
-        font-size: 8rem;
-        margin: 0 10px 0 0; /* solo margen derecho pequeño */
-        line-height: 1; /* reduce altura de línea */
+        font-size: 128px;  /* tamaño fijo en px */
+        margin: 0 10px 0 0; /* pequeño margen a la derecha */
+        line-height: 1;
     }
 
     .estrella {
-        font-size: 7rem;
+        font-size: 112px; /* tamaño fijo en px */
         animation: star-glow 2s infinite;
-        line-height: 1.5; /* reduce altura de línea */
+        line-height: 1;
     }
 
     .subtitulo {
         text-align: center;
         color: #d4af37;
-        font-size: 3rem;
-        margin: 5px 0; /* margen vertical mínimo */
-        line-height: 1; /* reduce altura de línea */
+        font-size: 48px; /* tamaño fijo en px */
+        margin: 2px 0; /* margen vertical mínimo */
+        line-height: 1;
         letter-spacing: 4px;
     }
 
-    p { margin: 0; } /* elimina márgenes por defecto de todos los <p> */
+    p { margin: 0; } /* elimina márgenes por defecto de los párrafos */
     </style>
 
     <p class="subtitulo">Bienvenid@ a</p>
