@@ -22,13 +22,13 @@ st.markdown(
     }
 
     .titulo-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        transform: scale(1.5);
-        overflow: hidden;  /* evita que sobresalga */
-    }
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;        /* no salga del contenedor */
+            word-break: break-word;  /* corta si es muy largo */
+        }
 
     .titulo-container {
         display: flex;
@@ -52,13 +52,10 @@ st.markdown(
     }
 
     .subtitulo {
-        text-align: center;
-        color: #d4af37;
-        font-size: 30px;
-        margin: 20px 2;
-        line-height: 4;
+        font-size: 24px;
+        margin: 2px 0;
+        line-height: 1;
         letter-spacing: 3px;
-        overflow: hidden;
     }
 
     * { margin: 0; padding: 0; } /* elimina márgenes y paddings globales */
