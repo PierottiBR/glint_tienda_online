@@ -21,30 +21,35 @@ st.markdown(
 
     .titulo-container {
         display: flex;
-        justify-content: center; /* centra horizontalmente */
-        align-items: center;     /* centra verticalmente */
-        margin-top: 20px;
+        justify-content: center;
+        align-items: center;
+        margin: 0; /* elimina márgenes verticales extra */
     }
 
     .titulo-glint {
         color: #d4af37;
         font-weight: 900;
-        font-size: 4rem;  /* título más grande */
-        margin-right: 15px; /* espacio entre título y estrella */
+        font-size: 8rem;
+        margin: 0 10px 0 0; /* solo margen derecho pequeño */
+        line-height: 1; /* reduce altura de línea */
     }
 
     .estrella {
-        font-size: 4.5rem; /* estrella más grande */
-        animation: star-glow 1.5s infinite;
+        font-size: 7rem;
+        animation: star-glow 2s infinite;
+        line-height: 1.5; /* reduce altura de línea */
     }
 
     .subtitulo {
         text-align: center;
         color: #d4af37;
-        font-size: 1.8rem;
-        margin-top: 5px;
-        letter-spacing: 2px;
+        font-size: 3rem;
+        margin: 5px 0; /* margen vertical mínimo */
+        line-height: 1; /* reduce altura de línea */
+        letter-spacing: 4px;
     }
+
+    p { margin: 0; } /* elimina márgenes por defecto de todos los <p> */
     </style>
 
     <p class="subtitulo">Bienvenid@ a</p>
