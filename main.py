@@ -57,6 +57,7 @@ st.markdown(
         margin: 20px 2;
         line-height: 4;
         letter-spacing: 3px;
+        overflow: hidden;
     }
 
     * { margin: 0; padding: 0; } /* elimina márgenes y paddings globales */
