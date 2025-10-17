@@ -26,7 +26,8 @@ st.markdown(
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transform: scale(1.5);  /* ajusta el tamaño global */
+        transform: scale(1.5);
+        overflow: hidden;  /* evita que sobresalga */
     }
 
     .titulo-container {
