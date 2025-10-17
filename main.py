@@ -29,7 +29,7 @@ st.markdown(
     .titulo-glint {
         color: #d4af37;
         font-weight: 900;
-        font-size: 8rem;
+        font-size: 20rem;
         margin: 0 10px 0 0; /* solo margen derecho pequeño */
         line-height: 1; /* reduce altura de línea */
     }
