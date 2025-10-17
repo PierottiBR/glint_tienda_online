@@ -10,6 +10,8 @@ with open(logo_path, "rb") as f:
 st.set_page_config(page_title="Glint Accesorios", page_icon=logo_path, layout="wide")
 
 # === Mostrar título sin clamp ni ícono ===
+import streamlit as st
+
 st.markdown(
     """
     <style>
@@ -19,23 +21,31 @@ st.markdown(
         100% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
     }
 
+    .titulo-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transform: scale(1.5);  /* ajusta el tamaño global */
+    }
+
     .titulo-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0; /* elimina márgenes extra */
+        margin: 0;
     }
 
     .titulo-glint {
         color: #d4af37;
         font-weight: 900;
-        font-size: 128px;  /* tamaño fijo en px */
-        margin: 0 10px 0 0; /* pequeño margen a la derecha */
+        font-size: 80px;
+        margin: 0 10px 0 0;
         line-height: 1;
     }
 
     .estrella {
-        font-size: 112px; /* tamaño fijo en px */
+        font-size: 70px;
         animation: star-glow 2s infinite;
         line-height: 1;
     }
@@ -43,24 +53,27 @@ st.markdown(
     .subtitulo {
         text-align: center;
         color: #d4af37;
-        font-size: 48px; /* tamaño fijo en px */
-        margin: 2px 0; /* margen vertical mínimo */
+        font-size: 30px;
+        margin: 2px 0;
         line-height: 1;
-        letter-spacing: 4px;
+        letter-spacing: 3px;
     }
 
-    p { margin: 0; } /* elimina márgenes por defecto de los párrafos */
+    * { margin: 0; padding: 0; } /* elimina márgenes y paddings globales */
     </style>
 
-    <p class="subtitulo">Bienvenid@ a</p>
-    <div class="titulo-container">
-        <p class="titulo-glint">Glint</p>
-        <p class="estrella">★</p>
+    <div class="titulo-wrapper">
+        <div class="subtitulo">Bienvenid@ a</div>
+        <div class="titulo-container">
+            <div class="titulo-glint">Glint</div>
+            <div class="estrella">★</div>
+        </div>
+        <div class="subtitulo">ACCESORIOS</div>
     </div>
-    <p class="subtitulo">ACCESORIOS</p>
     """,
     unsafe_allow_html=True
 )
+
 
 
 
