@@ -54,7 +54,7 @@ st.markdown(
         text-align: center;
         color: #d4af37;
         font-size: 30px;
-        margin: 20px 0;
+        margin: 20px 2;
         line-height: 1;
         letter-spacing: 3px;
     }
