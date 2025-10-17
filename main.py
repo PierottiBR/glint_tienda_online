@@ -19,37 +19,44 @@ st.markdown(
         100% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
     }
 
+    .titulo-container {
+        display: flex;
+        justify-content: center; /* centra horizontalmente */
+        align-items: center;     /* centra verticalmente */
+        margin-top: 20px;
+    }
+
     .titulo-glint {
-        text-align: center;
         color: #d4af37;
-        font-weight: 800;
-        font-size: 3rem;  /* más grande */
-        margin-top: 15px;
+        font-weight: 900;
+        font-size: 4rem;  /* título más grande */
+        margin-right: 15px; /* espacio entre título y estrella */
     }
 
     .estrella {
-        display: block;
-        font-size: 3.5rem; /* estrella más grande */
+        font-size: 4.5rem; /* estrella más grande */
         animation: star-glow 1.5s infinite;
-        margin: 0 auto;
     }
 
     .subtitulo {
         text-align: center;
         color: #d4af37;
-        font-size: 1.5rem;
-        margin-top: -10px;
+        font-size: 1.8rem;
+        margin-top: 5px;
         letter-spacing: 2px;
     }
     </style>
 
     <p class="subtitulo">Bienvenid@ a</p>
-    <p class="estrella">★</p>
-    <p class="titulo-glint">Glint</p>
+    <div class="titulo-container">
+        <p class="titulo-glint">Glint</p>
+        <p class="estrella">★</p>
+    </div>
     <p class="subtitulo">ACCESORIOS</p>
     """,
     unsafe_allow_html=True
 )
+
 
 
 from PIL import Image
