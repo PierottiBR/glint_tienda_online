@@ -1,6 +1,7 @@
 import streamlit as st
 import base64
 
+st.set_option("client.showErrorDetails", True)
 
 # === Cargar imagen PNG y convertir a base64 ===
 logo_path = "GlintAccesoriosLogo.png"  # tu imagen
@@ -46,7 +47,7 @@ st.markdown(
     }
 
     .estrella {
-        font-size: 70px;
+        font-size: 120px;
         animation: star-glow 2s infinite;
         line-height: 1;
     }
@@ -113,41 +114,28 @@ productos = [
     }
 ]
 
-# Crear columnas
-col1, col2, col3 = st.columns(3)
+#TABS CON CATEGORIAS
+tab1, tab2, tab3, tab4 = st.tabs(["Aros", "Collares", "Pulseras", "Anillos"])
 
-# Columna 1
-with col1:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_cubanos")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"])
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],width='stretch')
+with tab1:
+    col1, col2, col3, col4 = st.columns(4)
+    columnas = [col1, col2, col3, col4]
 
-# Columna 2
-with col2:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_flor")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"])
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],width='stretch')
+    for i, producto in enumerate(productos):
+        col = columnas[i % 4]  # distribuye en 4 columnas
+        with col:
+            st.image(ajustar_imagen(producto["imagen"]), use_container_width=True)
+            st.markdown(f"**{producto['nombre']}**")
+            st.write("Detalles:")
+            for detalle in producto["detalles"]:
+                st.write(detalle)
+            st.link_button("Comprar", producto["url"], use_container_width=True)
 
-# Columna 3
-with col3:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_cereza")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"])
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],width='stretch')
+with tab2:
+    st.write("Collares")
+
+with tab3:
+    st.write("Pulseras")
+
+with tab4:
+    st.write("Anillos")
