@@ -31,13 +31,16 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN DE RUTAS Y API (AJUSTAR SEGÚN TU ENTORNO) ---
 # Usamos st.secrets para las credenciales en Streamlit Cloud
-try:
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-    GITHUB_REPO = os.getenv("GITHUB_REPO")
-    GITHUB_BRANCH = os.getenv("GITHUB_BRANCH") if os.getenv("GITHUB_BRANCH") else "main"
-    TIMEOUT_API = 10
-except KeyError:
-    st.error("Error: Las credenciales de GitHub no están configuradas en `st.secrets`.")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+# Usamos el valor por defecto 'main' si no está en las variables de entorno
+GITHUB_BRANCH = os.getenv("GITHUB_BRANCH") if os.getenv("GITHUB_BRANCH") else "main" 
+TIMEOUT_API = 10 
+
+# **VERIFICACIÓN CORREGIDA**
+# Si alguna de las variables críticas es None o una cadena vacía, detenemos la app.
+if not GITHUB_TOKEN or not GITHUB_REPO:
+    st.error("Error: Las credenciales de GitHub (GITHUB_TOKEN y GITHUB_REPO) no se han cargado correctamente.")
     st.stop()
 
 
