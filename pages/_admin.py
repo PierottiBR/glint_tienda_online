@@ -247,183 +247,178 @@ def main():
         login_page()
     else:
         st.title("Panel de Administración", anchor=False)    
-# Login simple (Usamos el antiguo st.sidebar para simular un input fuera de la pantalla principal)
-# Ocultamos este input usando el CSS anterior, pero el componente st.sidebar.text_input sigue
-# siendo una forma útil de manejar inputs de login fuera del flujo de la app.
-password = st.sidebar.text_input("Contraseña de Admin", type="password")
-if password != "admin123": # CAMBIAR ESTO EN PRODUCCIÓN
-    # Solo mostramos el warning en la pantalla principal si el login falla
-    if password:
-        st.warning("Introduce la contraseña correcta para acceder.")
-    st.stop() 
 
-# st.sidebar.success("Acceso concedido") # Ya no se usa el sidebar
 
-# Cargamos el DF de la sesión
-df = st.session_state['products_df'].copy()
-    
-tab1, tab2 = st.tabs(["➕ Agregar Producto", "📝 Editar/Eliminar Inventario"])
+    # st.sidebar.success("Acceso concedido") # Ya no se usa el sidebar
 
-# --- Pestaña 1: Agregar Producto ---
-with tab1:
-    st.subheader("Nuevo Producto")
-    
-    # 1. DEFINIMOS LA ESTRUCTURA DE CATEGORÍAS
-    # Esto organiza qué subcategorías pertenecen a qué material
-    CATEGORIAS_ESTRUCTURA = {
-        "Acero Blanco": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
-        "Acero Dorado": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
-        "Acero Quirúrgico": ["Aros", "Pulseras", "Collares", "Dijes"],
-        "Plata": ["Aros"],
-        "Pañuelos": [],       # Sin subcategorías
-        "Complementos": []    # Sin subcategorías
-    }
+    # Cargamos el DF de la sesión
+        df = st.session_state['products_df'].copy()
+            
+        tab1, tab2 = st.tabs(["➕ Agregar Producto", "📝 Editar/Eliminar Inventario"])
 
-    with st.form("add_product_form", clear_on_submit=True):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            name = st.text_input("Nombre del producto")
+        # --- Pestaña 1: Agregar Producto ---
+        with tab1:
+            st.subheader("Nuevo Producto")
             
-            # --- NUEVA LÓGICA DE CATEGORÍAS ---
-            # Selector 1: Material o Línea principal
-            main_category = st.selectbox("Material / Línea", options=list(CATEGORIAS_ESTRUCTURA.keys()))
-            
-            # Buscamos las opciones correspondientes a la selección
-            sub_options = CATEGORIAS_ESTRUCTURA[main_category]
-            
-            # Selector 2: Solo aparece si hay subcategorías (ej. Pañuelos no tiene)
-            if sub_options:
-                sub_category = st.selectbox("Tipo de producto", options=sub_options)
-                # Combinamos para guardar en el CSV: "Acero Blanco - Aros"
-                category_final = f"{main_category} - {sub_category}"
-            else:
-                # Si no hay subcategoría, se guarda solo el nombre principal
-                category_final = main_category
-            # ----------------------------------
+            # 1. DEFINIMOS LA ESTRUCTURA DE CATEGORÍAS
+            # Esto organiza qué subcategorías pertenecen a qué material
+            CATEGORIAS_ESTRUCTURA = {
+                "Acero Blanco": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+                "Acero Dorado": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+                "Acero Quirúrgico": ["Aros", "Pulseras", "Collares", "Dijes"],
+                "Plata": ["Aros"],
+                "Pañuelos": [],       # Sin subcategorías
+                "Complementos": []    # Sin subcategorías
+            }
 
-            price = st.number_input("Precio ($)", min_value=0.0, step=100.0)
-            
-        with col2:
-            stock = st.number_input("Stock Inicial", min_value=0, step=1)
-            desc = st.text_area("Descripción")
-            image = st.file_uploader("Foto del producto", type=["jpg", "png", "jpeg"])
-            
-        submitted = st.form_submit_button("Guardar Producto")
-            
-        if submitted:
-            if name and price > 0:
+            with st.form("add_product_form", clear_on_submit=True):
+                col1, col2 = st.columns(2)
                 
-                # LLAMADA A LA FUNCIÓN UNIFICADA
-                img_path = handle_image_upload(image, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER)
-                
-                # Verificar si el manejo de la imagen falló
-                if img_path is False:
-                    st.warning(f"Producto '{name}' no guardado debido a un error de subida de imagen.")
-                    st.stop()
-                
-                # Calcular el nuevo ID
-                next_id = df['id'].max() + 1 if not df.empty and df['id'].max() is not None else 1
-                
-                new_product = pd.DataFrame([{
-                    'id': next_id,
-                    'name': name, 
-                    # AQUÍ USAMOS LA CATEGORÍA COMBINADA
-                    'category': category_final, 
-                    'price': price, 
-                    'stock': stock, 
-                    'image_path': img_path if img_path else "", 
-                    'description': desc
-                }])
-                
-                # Concatenar y guardar
-                updated_df = pd.concat([df, new_product], ignore_index=True)
-                
-                # Guardamos y capturamos la respuesta de GitHub
-                github_response = save_products_github(updated_df, f"Añadido producto: {name} ({category_final})")
-                
-                if github_response is not False:
-                    commit_sha = github_response.get("commit", {}).get("sha", "N/A")
-                    commit_url = github_response.get("commit", {}).get("html_url", "#")
-                    commit_message = github_response.get("commit", {}).get("message", "Actualización.")
+                with col1:
+                    name = st.text_input("Nombre del producto")
                     
-                    st.session_state['products_df'] = updated_df 
+                    # --- NUEVA LÓGICA DE CATEGORÍAS ---
+                    # Selector 1: Material o Línea principal
+                    main_category = st.selectbox("Material / Línea", options=list(CATEGORIAS_ESTRUCTURA.keys()))
                     
-                    st.success(f"🎉 **Producto '{name}' agregado con éxito!**")
-                    st.markdown(f"""
-                        **Detalles:**
-                        * **Categoría:** {category_final}
-                        * **Commit:** `{commit_sha[:7]}`
-                        * [Ver Commit en GitHub]({commit_url})
-                    """)
+                    # Buscamos las opciones correspondientes a la selección
+                    sub_options = CATEGORIAS_ESTRUCTURA[main_category]
                     
-                    st.rerun()
-                else:
-                    st.error("El producto no pudo guardarse en el CSV de GitHub.")
-            else:
-                st.error("El nombre y el precio son obligatorios.")
+                    # Selector 2: Solo aparece si hay subcategorías (ej. Pañuelos no tiene)
+                    if sub_options:
+                        sub_category = st.selectbox("Tipo de producto", options=sub_options)
+                        # Combinamos para guardar en el CSV: "Acero Blanco - Aros"
+                        category_final = f"{main_category} - {sub_category}"
+                    else:
+                        # Si no hay subcategoría, se guarda solo el nombre principal
+                        category_final = main_category
+                    # ----------------------------------
 
-# --- Pestaña 2: Editar/Eliminar Inventario ---
-with tab2:
-    st.subheader("Gestión de Inventario")
-    
-    if not df.empty:
-        # --- Edición Rápida ---
-        st.info("Edita las celdas y presiona 'Guardar Cambios' abajo.")
-        # Reconfiguramos las columnas para mayor legibilidad
-        column_config = {
-            "id": st.column_config.NumberColumn("ID"),
-            "name": st.column_config.TextColumn("Nombre"),
-            "category": st.column_config.TextColumn("Categoría"),
-            "price": st.column_config.NumberColumn("Precio", format="$%.2f"),
-            "stock": st.column_config.NumberColumn("Stock", format="%d"),
-            "description": st.column_config.TextColumn("Descripción"),
-            "image_path": st.column_config.TextColumn("Ruta Imagen")
-        }
-        
-        edited_df = st.data_editor(
-            df, 
-            column_config=column_config,
-            disabled=["id"],
-            hide_index=True,
-            key="editor_inventory"
-        )
-        
-        # Filtrar si hubo cambios reales (Streamlit data_editor compara automáticamente)
-        if edited_df.equals(df):
-            st.info("No se han detectado cambios en el editor.")
-        
-        if st.button("💾 Guardar Cambios en Stock/Precio"):
-            if save_products_github(edited_df, "Actualización masiva de inventario"):
-                st.session_state['products_df'] = edited_df # Actualizar sesión
-                st.success("Inventario actualizado y guardado en GitHub.")
-                st.rerun()
-
-        # --- Sección de Borrar ---
-        st.divider()
-        st.write("Eliminar producto")
-        
-        product_names = df['name'].tolist()
-        product_to_delete_name = st.selectbox("Selecciona producto a eliminar", product_names, key="delete_selector")
-        
-        if st.button("🗑️ Eliminar Producto"):
-            if product_to_delete_name:
-                # Obtener la ruta de la imagen antes de eliminar la fila
-                img_to_delete = df[df['name'] == product_to_delete_name]['image_path'].iloc[0]
-                
-                # Filtrar el DataFrame para eliminar el producto
-                updated_df = df[df['name'] != product_to_delete_name].reset_index(drop=True)
-                
-                if save_products_github(updated_df, f"Eliminado producto: {product_to_delete_name}"):
-                    st.session_state['products_df'] = updated_df # Actualizar sesión
+                    price = st.number_input("Precio ($)", min_value=0.0, step=100.0)
                     
-                    # Borrar archivo de imagen (si existe y es local)
-                    if img_to_delete and os.path.exists(img_to_delete):
-                        os.remove(img_to_delete)
+                with col2:
+                    stock = st.number_input("Stock Inicial", min_value=0, step=1)
+                    desc = st.text_area("Descripción")
+                    image = st.file_uploader("Foto del producto", type=["jpg", "png", "jpeg"])
+                    
+                submitted = st.form_submit_button("Guardar Producto")
+                    
+                if submitted:
+                    if name and price > 0:
                         
-                    st.warning(f"Producto '{product_to_delete_name}' eliminado y guardado en GitHub.")
-                    st.rerun()
+                        # LLAMADA A LA FUNCIÓN UNIFICADA
+                        img_path = handle_image_upload(image, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER)
+                        
+                        # Verificar si el manejo de la imagen falló
+                        if img_path is False:
+                            st.warning(f"Producto '{name}' no guardado debido a un error de subida de imagen.")
+                            st.stop()
+                        
+                        # Calcular el nuevo ID
+                        next_id = df['id'].max() + 1 if not df.empty and df['id'].max() is not None else 1
+                        
+                        new_product = pd.DataFrame([{
+                            'id': next_id,
+                            'name': name, 
+                            # AQUÍ USAMOS LA CATEGORÍA COMBINADA
+                            'category': category_final, 
+                            'price': price, 
+                            'stock': stock, 
+                            'image_path': img_path if img_path else "", 
+                            'description': desc
+                        }])
+                        
+                        # Concatenar y guardar
+                        updated_df = pd.concat([df, new_product], ignore_index=True)
+                        
+                        # Guardamos y capturamos la respuesta de GitHub
+                        github_response = save_products_github(updated_df, f"Añadido producto: {name} ({category_final})")
+                        
+                        if github_response is not False:
+                            commit_sha = github_response.get("commit", {}).get("sha", "N/A")
+                            commit_url = github_response.get("commit", {}).get("html_url", "#")
+                            commit_message = github_response.get("commit", {}).get("message", "Actualización.")
+                            
+                            st.session_state['products_df'] = updated_df 
+                            
+                            st.success(f"🎉 **Producto '{name}' agregado con éxito!**")
+                            st.markdown(f"""
+                                **Detalles:**
+                                * **Categoría:** {category_final}
+                                * **Commit:** `{commit_sha[:7]}`
+                                * [Ver Commit en GitHub]({commit_url})
+                            """)
+                            
+                            st.rerun()
+                        else:
+                            st.error("El producto no pudo guardarse en el CSV de GitHub.")
+                    else:
+                        st.error("El nombre y el precio son obligatorios.")
+
+        # --- Pestaña 2: Editar/Eliminar Inventario ---
+        with tab2:
+            st.subheader("Gestión de Inventario")
+            
+            if not df.empty:
+                # --- Edición Rápida ---
+                st.info("Edita las celdas y presiona 'Guardar Cambios' abajo.")
+                # Reconfiguramos las columnas para mayor legibilidad
+                column_config = {
+                    "id": st.column_config.NumberColumn("ID"),
+                    "name": st.column_config.TextColumn("Nombre"),
+                    "category": st.column_config.TextColumn("Categoría"),
+                    "price": st.column_config.NumberColumn("Precio", format="$%.2f"),
+                    "stock": st.column_config.NumberColumn("Stock", format="%d"),
+                    "description": st.column_config.TextColumn("Descripción"),
+                    "image_path": st.column_config.TextColumn("Ruta Imagen")
+                }
+                
+                edited_df = st.data_editor(
+                    df, 
+                    column_config=column_config,
+                    disabled=["id"],
+                    hide_index=True,
+                    key="editor_inventory"
+                )
+                
+                # Filtrar si hubo cambios reales (Streamlit data_editor compara automáticamente)
+                if edited_df.equals(df):
+                    st.info("No se han detectado cambios en el editor.")
+                
+                if st.button("💾 Guardar Cambios en Stock/Precio"):
+                    if save_products_github(edited_df, "Actualización masiva de inventario"):
+                        st.session_state['products_df'] = edited_df # Actualizar sesión
+                        st.success("Inventario actualizado y guardado en GitHub.")
+                        st.rerun()
+
+                # --- Sección de Borrar ---
+                st.divider()
+                st.write("Eliminar producto")
+                
+                product_names = df['name'].tolist()
+                product_to_delete_name = st.selectbox("Selecciona producto a eliminar", product_names, key="delete_selector")
+                
+                if st.button("🗑️ Eliminar Producto"):
+                    if product_to_delete_name:
+                        # Obtener la ruta de la imagen antes de eliminar la fila
+                        img_to_delete = df[df['name'] == product_to_delete_name]['image_path'].iloc[0]
+                        
+                        # Filtrar el DataFrame para eliminar el producto
+                        updated_df = df[df['name'] != product_to_delete_name].reset_index(drop=True)
+                        
+                        if save_products_github(updated_df, f"Eliminado producto: {product_to_delete_name}"):
+                            st.session_state['products_df'] = updated_df # Actualizar sesión
+                            
+                            # Borrar archivo de imagen (si existe y es local)
+                            if img_to_delete and os.path.exists(img_to_delete):
+                                os.remove(img_to_delete)
+                                
+                            st.warning(f"Producto '{product_to_delete_name}' eliminado y guardado en GitHub.")
+                            st.rerun()
+                    else:
+                        st.warning("Selecciona un producto para eliminar.")
             else:
-                st.warning("Selecciona un producto para eliminar.")
-    else:
-        st.info("No hay productos cargados en el inventario.")
+                st.info("No hay productos cargados en el inventario.")
+
+if __name__ == "__main__":
+    main()
