@@ -91,40 +91,34 @@ def load_products_github():
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
     # --- CSS PARA CENTRAR EL CONTENIDO ---
-    centered_header_css = """
-    <style>
-    /* CLASE PARA CENTRAR EL CONTENIDO DENTRO DE SU COLUMNA */
-    .centered-content {
-        display: flex;
-        flex-direction: column; /* Apila logo y título verticalmente */
-        align-items: center;    /* Centra los elementos horizontalmente */
-        text-align: center;
-    }
-    /* AJUSTE PARA EL TÍTULO DE STREAMLIT */
-    .st-emotion-cache-10q064s h1 { 
-        text-align: center;
-        width: 100%; 
-    }
-    </style>
-    """
-    st.markdown(centered_header_css, unsafe_allow_html=True)
+    def get_base64(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode()
 
-    # --- VISUALIZACIÓN CENTRADA Y CORREGIDA ---
+    #image_base64 = get_base64("images/background.png")
+    banner_base64 = get_base64("GlintAccesoriosLogo.png")
+    
 
-    # 1. Usamos un contenedor 'centered-content' para envolver el logo y el título
-    st.markdown('<div class="centered-content">', unsafe_allow_html=True)
+    # Cargar CSS y reemplazar la variable dinámica
+    def load_css(file_name, image_base64):
+        with open(file_name, "r") as f:
+            css_content = f.read().replace("{image_base64}", image_base64)
+            st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
-    # 2. Imagen del Logo (Usamos 'width=200' para controlar el tamaño y evitar que se estire)
-    # Si el fondo sigue siendo visible, el problema está en el archivo GlintAccesoriosLogo.png
-    # original (no fue guardado con transparencia).
-    st.image('GlintAccesoriosLogo.png', width=200) 
+    def setup_casino_theme():
+        load_css("casino_theme.css")
 
-    # 3. Título centrado
-    st.title("💎 Glint Accesorios")
+    setup_casino_theme()
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("---")
+    # Mostrar el banner con HTML para asegurar que el CSS se aplique
+    st.markdown(
+        f"""
+        <div class="contenedor">
+            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="banner">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     # 1. Cargar Productos desde GitHub
     products_df = load_products_github()
