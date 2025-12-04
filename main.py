@@ -119,7 +119,7 @@ def store_page():
     st.markdown(
         f"""
         <div class="contenedor">
-            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="Glint Accesorios Logo">
+            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="banner">
         </div>
         """,
         unsafe_allow_html=True
