@@ -95,36 +95,41 @@ def store_page():
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode()
 
-    # Obtén el base64 del logo (asumiendo que GlintAccesoriosLogo.png existe)
-    banner_base64 = get_base64("Gemini_Generated_Image_fn2rx0fn2rx0fn2r (1).png")
-    
-    # Cargar CSS y reemplazar la variable dinámica
-    def load_css(file_name): # ¡QUITAMOS image_base64 como argumento aquí!
+    # Obtén el base64 del logo
+    # Asegúrate de que esta imagen exista en tu carpeta o usa un try/except
+    try:
+        banner_base64 = get_base64("Gemini_Generated_Image_fn2rx0fn2rx0fn2r (1).png")
+    except FileNotFoundError:
+        banner_base64 = "" # O manejar el error si la imagen no está
+
+    # Cargar CSS
+    def load_css(file_name): 
         with open(file_name, "r") as f:
-            # Reemplazamos {image_base64} si es necesario para el BACKGROUND (que no está en este fragmento)
             css_content = f.read() 
             st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
     def setup_casino_theme():
-        # Aquí puedes pasar la URL del background si la tienes
-        load_css("casino_theme.css") 
+        # Asegúrate de que 'casino_theme.css' exista
+        try:
+            load_css("casino_theme.css") 
+        except FileNotFoundError:
+            pass
 
     setup_casino_theme()
 
     # --- CENTRADO Y VISUALIZACIÓN DEL LOGO ---
-    
-    # El CSS del banner ya tiene "justify-content: center" y "align-items: center".
-    # Usamos ese contenedor y el título de Streamlit.
-    st.markdown(
-        f"""
-        <div class="contenedor">
-            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="banner">
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    if banner_base64:
+        st.markdown(
+            f"""
+            <div class="contenedor">
+                <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="banner">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.title("Tienda") # Fallback si no hay imagen
 
-    
     st.markdown("---")
     
     # 1. Cargar Productos desde GitHub
@@ -134,7 +139,7 @@ def store_page():
     if 'cart' not in st.session_state:
         st.session_state.cart = []
 
-    # Sidebar - Carrito (aunque el sidebar esté oculto, el contexto 'with st.sidebar:' sigue siendo útil)
+    # Sidebar - Carrito
     with st.sidebar:
         st.header("🛒 Tu Carrito")
         if len(st.session_state.cart) > 0:
@@ -153,7 +158,7 @@ def store_page():
             st.subheader(f"Total: ${total:,.0f}")
             
             # Botón de Checkout (WhatsApp)
-            phone_number = "549407404217" # TU NUMERO AQUI
+            phone_number = "549407404217" 
             message = "Hola! Quiero encargar lo siguiente:%0A"
             for index, row in grouped_cart.iterrows():
                 message += f"- {row['cantidad']}x {row['name']} (${row['price']})%0A"
@@ -168,63 +173,90 @@ def store_page():
         else:
             st.info("El carrito está vacío.")
 
-    # 2. Manejo de Filtros
+    # ============================================================
+    # 2. MANEJO DE FILTROS Y CATEGORÍAS JERÁRQUICAS (ACTUALIZADO)
+    # ============================================================
     
     # Filtrar solo productos con stock > 0
-    available_products = products_df[products_df['stock'] > 0]
+    available_products = products_df[products_df['stock'] > 0].copy()
+
+    # --- LÓGICA DE SEPARACIÓN (Parsing) ---
+    def split_category(val):
+        if isinstance(val, str) and " - " in val:
+            parts = val.split(" - ", 1)
+            return parts[0], parts[1] # Retorna (Material, Tipo)
+        return val, None # Retorna (Material, None) si no hay guión
+
+    # Aplicamos la función para generar columnas temporales
+    if not available_products.empty:
+        available_products[['main_cat', 'sub_cat']] = available_products['category'].apply(
+            lambda x: pd.Series(split_category(x))
+        )
+    else:
+        available_products['main_cat'] = []
+        available_products['sub_cat'] = []
     
-    # Obtener todas las categorías disponibles y únicas
-    all_categories = available_products['category'].dropna().unique().tolist()
-    tab_names = ["Todas"] + all_categories 
+    # Obtener categorías principales únicas para las PESTAÑAS (Tabs)
+    main_categories = sorted(available_products['main_cat'].dropna().unique().tolist())
+    tab_names = ["Todas"] + main_categories 
 
     # Crear las pestañas de Streamlit
     product_tabs = st.tabs(tab_names)
 
-    # Iterar sobre las pestañas para dibujar el contenido filtrado dentro de cada tab
+    # Iterar sobre las pestañas
     for i, tab_name in enumerate(tab_names):
         
-        # El contenido se dibuja dentro del contenedor de la pestaña actual
         with product_tabs[i]:
             
-            # --- Lógica de Filtrado ---
+            # --- A. Filtrado por Pestaña (Nivel 1: Material) ---
             if tab_name == "Todas":
                 current_filtered_products = available_products
             else:
-                current_filtered_products = available_products[available_products['category'] == tab_name]
+                current_filtered_products = available_products[available_products['main_cat'] == tab_name]
             
+            # --- B. Filtrado por Subcategoría (Nivel 2: Tipo) ---
+            # Solo mostramos esto si NO estamos en "Todas" y si hay subcategorías disponibles
+            unique_subcats = current_filtered_products['sub_cat'].dropna().unique().tolist()
             
-            # ----------------------------------------------------
-            # ✅ CORRECCIÓN DE ORDENAMIENTO: Ordenar por ID o Nombre
-            # ----------------------------------------------------
-            if not current_filtered_products.empty:
-                # Ordenar por el ID del producto (asumiendo que ID = orden de creación)
-                current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
-            
-            
-            # --- 3. Grid de productos ---
-            if not current_filtered_products.empty:
-    
-                # Ordenar por el ID del producto (o 'name' si lo prefieres)
-                current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
+            if tab_name != "Todas" and len(unique_subcats) > 0:
+                sub_options = ["Ver todo"] + sorted(unique_subcats)
                 
-                # Mostrar el grid de productos en 3 columnas
+                st.write("📂 **Filtrar por tipo:**")
+                selected_sub = st.radio(
+                    label="Selecciona tipo",
+                    options=sub_options,
+                    horizontal=True,
+                    label_visibility="collapsed",
+                    key=f"sub_filter_{i}" # Key única para cada pestaña
+                )
+                
+                if selected_sub != "Ver todo":
+                    current_filtered_products = current_filtered_products[current_filtered_products['sub_cat'] == selected_sub]
+            
+            st.divider() # Separador visual
+            
+            # --- C. Ordenamiento ---
+            if not current_filtered_products.empty:
+                current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
+            
+            # ============================================================
+            # 3. GRID DE PRODUCTOS (TU DISEÑO ORIGINAL)
+            # ============================================================
+            if not current_filtered_products.empty:
+
                 cols = st.columns(3) 
-                
-                # INICIALIZAR EL CONTADOR DE COLUMNAS (LO NUEVO)
-                col_index = 0 
+                col_index = 0 # Inicializar contador manual
                 
                 for index, row in current_filtered_products.iterrows():
                     
-                    # ✅ CORRECCIÓN: Usamos el contador 'col_index' en lugar del 'index' de Pandas
                     with cols[col_index % 3]: 
                         with st.container(border=True):
                             
                             relative_path = row['image_path']
                             
-                            # CONSTRUIR LA URL RAW DE GITHUB (Lógica de visualización)
+                            # Construir URL Raw
                             raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/{relative_path}"
                             
-                            # Mostrar la imagen
                             try:
                                 if relative_path:
                                     st.image(raw_url, use_column_width=True)
@@ -234,21 +266,25 @@ def store_page():
                                 st.image("https://via.placeholder.com/150?text=Error+Cargando", use_column_width=True)
                             
                             st.subheader(row['name'])
-                            st.caption(row['category'])
+                            
+                            # Mostrar categoría limpia (opcional: quitar el guión visualmente)
+                            display_cat = row['category'].replace(" - ", " › ")
+                            st.caption(display_cat)
+                            
                             st.write(row['description'])
                             st.write(f"**Precio: ${row['price']:,.0f}**")
                             st.write(f"Stock: {row['stock']} un.")
                             
-                            # Botón "Agregar al Carrito" 
+                            # Key única combinando Tab e ID del producto
                             if st.button(f"Agregar al Carrito", key=f"btn_{tab_name}_{row['id']}"): 
                                 st.session_state.cart.append({"name": row['name'], "price": row['price']})
                                 st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
                                 st.rerun()
 
-                    # ✅ INCREMENTAR EL CONTADOR DESPUÉS DE DIBUJAR
+                    # Incrementar contador
                     col_index += 1
             else:
-                st.info(f"No hay productos disponibles en la categoría: **{tab_name}**.")
+                st.info(f"No hay productos disponibles en esta sección.")
 
 # --- MAIN APP ---
 if __name__ == "__main__":
