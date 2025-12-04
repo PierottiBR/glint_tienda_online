@@ -101,23 +101,25 @@ def store_page():
         text-align: center;
     }
     /* AJUSTE PARA EL TÍTULO DE STREAMLIT */
-    .st-emotion-cache-10q064s h1 { /* Este selector apunta al <h1> (título) */
+    .st-emotion-cache-10q064s h1 { 
         text-align: center;
-        width: 100%; /* Asegura que ocupe todo el ancho para centrar el texto */
+        width: 100%; 
     }
     </style>
     """
     st.markdown(centered_header_css, unsafe_allow_html=True)
 
-    # --- VISUALIZACIÓN CENTRADA ---
+    # --- VISUALIZACIÓN CENTRADA Y CORREGIDA ---
 
-    # Usamos un contenedor 'centered-content' para envolver el logo y el título
+    # 1. Usamos un contenedor 'centered-content' para envolver el logo y el título
     st.markdown('<div class="centered-content">', unsafe_allow_html=True)
 
-    # 1. Imagen del Logo (se mostrará transparente si el archivo PNG lo es)
-    st.image('GlintAccesoriosLogo.png', width=200) # Usa 'width' para controlar el tamaño, no usemos use_column_width=True
+    # 2. Imagen del Logo (Usamos 'width=200' para controlar el tamaño y evitar que se estire)
+    # Si el fondo sigue siendo visible, el problema está en el archivo GlintAccesoriosLogo.png
+    # original (no fue guardado con transparencia).
+    st.image('GlintAccesoriosLogo.png', width=200) 
 
-    # 2. Título centrado
+    # 3. Título centrado
     st.title("💎 Glint Accesorios")
 
     st.markdown('</div>', unsafe_allow_html=True)
