@@ -1,77 +1,105 @@
 # 🛍️_Tienda.py
 
 import streamlit as st
-import sqlite3
 import pandas as pd
 import os
 from PIL import Image
-# import shutil # shutil ya no es necesario si no borras archivos
+import requests
+import base64
+from io import StringIO
 
-# --- CONFIGURACIÓN INICIAL ---
+# --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
 st.set_page_config(page_title="Bijoutery Glam", layout="wide", page_icon="💎")
-DB_NAME = "bijoutery.db"
+
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+/* Esta parte oculta explícitamente el sidebar */
+div[data-testid="stSidebar"] {
+    visibility: hidden;
+    display: none;
+}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+# -----------------------------------------------------
+
+# --- CONFIGURACIÓN DE RUTAS Y API ---
+# Usamos st.secrets para cargar las credenciales de forma segura
+try:
+    GITHUB_REPO = st.secrets["github"]["repo"]
+    GITHUB_TOKEN = st.secrets["github"]["token"]
+    TIMEOUT_API = st.secrets.get("github", {}).get("timeout", 10)
+except KeyError:
+    # Esto aparecerá si las credenciales no están configuradas
+    st.error("Error: Las credenciales de GitHub no están configuradas en `st.secrets`.")
+    st.stop()
+
+
 IMG_FOLDER = "img"
+PRODUCTS_FILE = "products.csv"
+PRODUCTS_PATH = f"files_csv/{PRODUCTS_FILE}" # Ruta dentro de GitHub
 
-# Asegurar que existe la carpeta de imágenes (para desarrollo local)
-if not os.path.exists(IMG_FOLDER):
-    os.makedirs(IMG_FOLDER)
 
-# --- FUNCIONES DE BASE DE DATOS (Mantenidas por ahora) ---
-# ... (deja todas tus funciones init_db y run_query aquí, son compartidas) ...
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT,
-            price REAL,
-            stock INTEGER,
-            image_path TEXT,
-            description TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+# --- FUNCIONES DE LECTURA DE CSV EN GITHUB ---
 
-def run_query(query, params=(), return_data=False):
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute(query, params)
-    if return_data:
-        data = c.fetchall()
-        columns = [desc[0] for desc in c.description]
-        conn.close()
-        return pd.DataFrame(data, columns=columns)
-    conn.commit()
-    conn.close()
+@st.cache_data(ttl=600) # Caching: Los datos se refrescan cada 10 minutos
+def load_products_github():
+    """Carga el DataFrame de productos desde el CSV en GitHub (solo lectura)."""
+    default_columns = ['id', 'name', 'category', 'price', 'stock', 'image_path', 'description']
+    default_df = pd.DataFrame(columns=default_columns)
+    
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{PRODUCTS_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
-# --- FUNCIONES AUXILIARES ---
-# ... (deja tu función save_uploaded_file aquí) ...
-def save_uploaded_file(uploaded_file):
-    if uploaded_file is not None:
-        file_path = os.path.join(IMG_FOLDER, uploaded_file.name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        return file_path
-    return None
+    try:
+        response = requests.get(url, headers=headers, timeout=TIMEOUT_API)
+        response.raise_for_status()
+        
+        file_info = response.json()
+        content_encoded = file_info["content"].replace('\n', '')
+        content_decoded = base64.b64decode(content_encoded).decode('utf-8')
+        
+        # Leer el contenido como CSV
+        df = pd.read_csv(StringIO(content_decoded))
+        
+        # Asegurarse de que las columnas numéricas sean números (importante para price y stock)
+        df['price'] = pd.to_numeric(df['price'], errors='coerce').fillna(0)
+        df['stock'] = pd.to_numeric(df['stock'], errors='coerce').fillna(0).astype(int)
+        
+        return df
+        
+    except requests.exceptions.HTTPError as http_err:
+        if response.status_code == 404:
+            st.warning("Archivo products.csv no encontrado en GitHub. Tienda vacía.")
+            return default_df
+        st.error(f"Error HTTP al cargar productos: {http_err}. Detalles: {response.text}")
+    except Exception as e:
+        st.error(f"Error cargando productos: {str(e)}")
+    
+    return default_df
 
 
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
     st.title("💎 Tienda de Bijoutery & Accesorios")
     
+    # 1. Cargar Productos desde GitHub
+    products_df = load_products_github()
+    
     # Inicializar carrito
     if 'cart' not in st.session_state:
         st.session_state.cart = []
 
-    # Sidebar - Carrito
+    # Sidebar - Carrito (aunque el sidebar esté oculto, el contexto 'with st.sidebar:' sigue siendo útil)
     with st.sidebar:
         st.header("🛒 Tu Carrito")
         if len(st.session_state.cart) > 0:
             total = 0
             cart_df = pd.DataFrame(st.session_state.cart)
+            
             # Agrupar por producto para mostrar cantidad
             grouped_cart = cart_df.groupby(['name', 'price']).size().reset_index(name='cantidad')
             
@@ -99,35 +127,42 @@ def store_page():
         else:
             st.info("El carrito está vacío.")
 
-    # Filtros
-    # Asegúrate de que init_db se ejecute si es la primera vez
-    init_db() 
-    categories = ["Todas"] + [r[0] for r in run_query("SELECT DISTINCT category FROM products", return_data=True).values.tolist()]
+    # 2. Manejo de Filtros
+    
+    # Filtrar solo productos con stock > 0
+    available_products = products_df[products_df['stock'] > 0]
+    
+    # Obtener categorías únicas
+    categories = ["Todas"] + available_products['category'].dropna().unique().tolist()
     selected_cat = st.selectbox("Filtrar por categoría", categories)
 
-    query = "SELECT * FROM products WHERE stock > 0"
-    params = ()
     if selected_cat != "Todas":
-        query += " AND category = ?"
-        params = (selected_cat,)
+        filtered_products = available_products[available_products['category'] == selected_cat]
+    else:
+        filtered_products = available_products
     
-    products = run_query(query, params, return_data=True)
-
-    # Grid de productos
-    if not products.empty:
+    # 3. Grid de productos
+    if not filtered_products.empty:
         cols = st.columns(3) # 3 columnas por fila
-        for index, row in products.iterrows():
+        
+        for index, row in filtered_products.iterrows():
             with cols[index % 3]:
                 with st.container(border=True):
-                    # Mostrar imagen si existe
-                    if row['image_path'] and os.path.exists(row['image_path']):
-                        try:
-                            image = Image.open(row['image_path'])
+                    # Mostrar imagen (NOTA: Si estás en Streamlit Cloud y las imágenes 
+                    # fueron subidas por el admin, las rutas locales NO funcionarán)
+                    # La ruta debe ser una URL pública de la imagen.
+                    image_source = row['image_path'] if row['image_path'] else "https://via.placeholder.com/150?text=Sin+Foto"
+                    
+                    try:
+                        # Si es una ruta local, necesita Image.open, si es URL, st.image lo maneja
+                        if os.path.exists(image_source):
+                            image = Image.open(image_source)
                             st.image(image, use_column_width=True)
-                        except:
-                            st.error("Error cargando imagen")
-                    else:
-                        st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
+                        else:
+                            # Asumimos que es una URL si no existe localmente
+                            st.image(image_source, use_column_width=True)
+                    except Exception:
+                        st.image("https://via.placeholder.com/150?text=Error+Cargando", use_column_width=True)
                     
                     st.subheader(row['name'])
                     st.caption(row['category'])
@@ -142,9 +177,7 @@ def store_page():
     else:
         st.info("No hay productos disponibles en esta categoría.")
 
-# --- MAIN APP (MODIFICADO) ---
+# --- MAIN APP ---
 if __name__ == "__main__":
-    init_db() # Asegura que la DB exista al inicio de la app
-    st.sidebar.image("https://cdn-icons-png.flaticon.com/512/6491/6491546.png", width=100)
-    # Ya no necesitas el radio button de navegación, Streamlit lo hace automáticamente
+    # Eliminado init_db() y st.sidebar.image()
     store_page()
