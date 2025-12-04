@@ -239,11 +239,11 @@ def store_page():
                             
                             try:
                                 if relative_path:
-                                    st.image(raw_url, use_column_width=True)
+                                    st.image(raw_url, width=True)
                                 else:
-                                    st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
+                                    st.image("https://via.placeholder.com/150?text=Sin+Foto", width=True)
                             except:
-                                st.image("https://via.placeholder.com/150?text=Error", use_column_width=True)
+                                st.image("https://via.placeholder.com/150?text=Error", width=True)
                             
                             st.subheader(row['name'])
                             st.caption(row['category'].replace(" - ", " › "))
