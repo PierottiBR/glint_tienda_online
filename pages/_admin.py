@@ -11,7 +11,12 @@ from io import StringIO
 import json # Necesario para manejar la respuesta JSON de la API
 from dotenv import load_dotenv
 load_dotenv()
+from hashlib import sha256
 
+def init_session_state():
+    """Inicializa las variables de sesión"""
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
 
 # --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
 st.set_page_config(page_title="Bijoutery Glam - Admin", layout="wide", page_icon="⚙️")
@@ -202,10 +207,46 @@ def handle_image_upload(uploaded_file, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH,
 # --- CARGA INICIAL DE DATOS ---
 if 'products_df' not in st.session_state:
     st.session_state['products_df'] = load_products_github()
+def hash_password(password):
+    """Crea un hash SHA-256 de la contraseña"""
+    return sha256(password.encode()).hexdigest()
 
+def check_credentials(username, password):
+    """Verifica las credenciales del usuario"""
+    valid_credentials = {
+        'glintadmin': hash_password('epiglint123')
+    }
+    return (username in valid_credentials and 
+            valid_credentials[username] == hash_password(password))
 # --- INTERFAZ: PANEL DE ADMIN ---
 st.title("🔐 Panel de Administración")
+def login_page():
+    """Página de inicio de sesión"""
+    st.title("Login")
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        submit_button = st.form_submit_button("Login")
+        
+        if submit_button:
+            if check_credentials(username, password):
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.success("Login successful!")
+                st.rerun()
+            else:
+                st.session_state.attempts += 1
+                st.error(f"Invalid credentials! Attempt {st.session_state.attempts} of 3")
+                if st.session_state.attempts >= 3:
+                    st.error("Maximum login attempts reached. Please try again later.")
+                    st.session_state.attempts = 0
+def main():
+    init_session_state()
     
+    if not st.session_state.authenticated:
+        login_page()
+    else:
+        st.title("Panel de Administración", anchor=False)    
 # Login simple (Usamos el antiguo st.sidebar para simular un input fuera de la pantalla principal)
 # Ocultamos este input usando el CSS anterior, pero el componente st.sidebar.text_input sigue
 # siendo una forma útil de manejar inputs de login fuera del flujo de la app.
