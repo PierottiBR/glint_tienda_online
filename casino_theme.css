@@ -137,12 +137,6 @@ div.stSelectbox > div[data-baseweb="select"] {
 
 /* --- OTROS ELEMENTOS DE ESTILO --- */
 
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background: var(--color-dark-surface) !important;
-    border-right: 3px solid var(--color-accent-main) !important; /* Borde Rose Gold */
-}
-
 /* Tablas */
 .stDataFrame {
     background: var(--color-dark-surface) !important;
