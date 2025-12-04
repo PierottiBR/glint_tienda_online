@@ -124,9 +124,7 @@ def store_page():
         """,
         unsafe_allow_html=True
     )
-    
-    # st.title utiliza la clase h1, que en tu CSS ya tiene text-align: center !important
-    st.title("💎 Tienda de Bijoutery & Accesorios")
+
     
     st.markdown("---")
     
