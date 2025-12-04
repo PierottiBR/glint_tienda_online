@@ -51,7 +51,7 @@ PRODUCTS_PATH = f"files_csv/{PRODUCTS_FILE}" # Ruta dentro de GitHub
 
 # --- FUNCIONES DE LECTURA DE CSV EN GITHUB ---
 
-@st.cache_data(ttl=600) # Caching: Los datos se refrescan cada 10 minutos
+@st.cache_data(ttl=30) # Caching: Los datos se refrescan cada 10 minutos
 def load_products_github():
     """Carga el DataFrame de productos desde el CSV en GitHub (solo lectura)."""
     default_columns = ['id', 'name', 'category', 'price', 'stock', 'image_path', 'description']
