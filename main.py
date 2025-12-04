@@ -90,8 +90,39 @@ def load_products_github():
 
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
-    st.image('GlintAccesoriosLogo.png', use_column_width=True)
+    # --- CSS PARA CENTRAR EL CONTENIDO ---
+    centered_header_css = """
+    <style>
+    /* CLASE PARA CENTRAR EL CONTENIDO DENTRO DE SU COLUMNA */
+    .centered-content {
+        display: flex;
+        flex-direction: column; /* Apila logo y título verticalmente */
+        align-items: center;    /* Centra los elementos horizontalmente */
+        text-align: center;
+    }
+    /* AJUSTE PARA EL TÍTULO DE STREAMLIT */
+    .st-emotion-cache-10q064s h1 { /* Este selector apunta al <h1> (título) */
+        text-align: center;
+        width: 100%; /* Asegura que ocupe todo el ancho para centrar el texto */
+    }
+    </style>
+    """
+    st.markdown(centered_header_css, unsafe_allow_html=True)
+
+    # --- VISUALIZACIÓN CENTRADA ---
+
+    # Usamos un contenedor 'centered-content' para envolver el logo y el título
+    st.markdown('<div class="centered-content">', unsafe_allow_html=True)
+
+    # 1. Imagen del Logo (se mostrará transparente si el archivo PNG lo es)
+    st.image('GlintAccesoriosLogo.png', width=200) # Usa 'width' para controlar el tamaño, no usemos use_column_width=True
+
+    # 2. Título centrado
     st.title("💎 Glint Accesorios")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
     
     # 1. Cargar Productos desde GitHub
     products_df = load_products_github()
