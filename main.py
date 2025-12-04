@@ -173,50 +173,73 @@ def store_page():
     # Filtrar solo productos con stock > 0
     available_products = products_df[products_df['stock'] > 0]
     
-    # Obtener categorías únicas
-    categories = ["Todas"] + available_products['category'].dropna().unique().tolist()
-    selected_cat = st.selectbox("Filtrar por categoría", categories)
-
-    if selected_cat != "Todas":
-        filtered_products = available_products[available_products['category'] == selected_cat]
-    else:
-        filtered_products = available_products
+    # ----------------------------------------------------
+    # CAMBIO: REEMPLAZAR st.selectbox por st.tabs
+    # ----------------------------------------------------
     
-    # 3. Grid de productos
-    if not filtered_products.empty:
-        cols = st.columns(3) # 3 columnas por fila
+    # Obtener todas las categorías disponibles y únicas
+    all_categories = available_products['category'].dropna().unique().tolist()
+    tab_names = ["Todas"] + all_categories 
+
+    # Crear las pestañas de Streamlit
+    product_tabs = st.tabs(tab_names)
+
+    # Iterar sobre las pestañas para dibujar el contenido filtrado dentro de cada tab
+    for i, tab_name in enumerate(tab_names):
         
-        for index, row in filtered_products.iterrows():
-            with cols[index % 3]:
-                with st.container(border=True):
-                    # Mostrar imagen (NOTA: Si estás en Streamlit Cloud y las imágenes 
-                    # fueron subidas por el admin, las rutas locales NO funcionarán)
-                    # La ruta debe ser una URL pública de la imagen.
-                    image_source = row['image_path'] if row['image_path'] else "https://via.placeholder.com/150?text=Sin+Foto"
-                    
-                    try:
-                        # Si es una ruta local, necesita Image.open, si es URL, st.image lo maneja
-                        if os.path.exists(image_source):
-                            image = Image.open(image_source)
-                            st.image(image, use_column_width=True)
-                        else:
-                            # Asumimos que es una URL si no existe localmente
-                            st.image(image_source, use_column_width=True)
-                    except Exception:
-                        st.image("https://via.placeholder.com/150?text=Error+Cargando", use_column_width=True)
-                    
-                    st.subheader(row['name'])
-                    st.caption(row['category'])
-                    st.write(row['description'])
-                    st.write(f"**Precio: ${row['price']:,.0f}**")
-                    st.write(f"Stock: {row['stock']} un.")
-                    
-                    if st.button(f"Agregar al Carrito", key=f"btn_{row['id']}"):
-                        st.session_state.cart.append({"name": row['name'], "price": row['price']})
-                        st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
-                        st.rerun()
-    else:
-        st.info("No hay productos disponibles en esta categoría.")
+        # El contenido se dibuja dentro del contenedor de la pestaña actual
+        with product_tabs[i]:
+            
+            # --- Lógica de Filtrado ---
+            if tab_name == "Todas":
+                # Si es la pestaña "Todas", muestra todos los productos disponibles
+                current_filtered_products = available_products
+            else:
+                # Si es una categoría específica, filtra el DataFrame
+                current_filtered_products = available_products[available_products['category'] == tab_name]
+            
+            
+            # --- 3. Grid de productos (Ajustado para el tab actual) ---
+            if not current_filtered_products.empty:
+                # Mostrar el grid de productos en 3 columnas
+                cols = st.columns(3) 
+                
+                for index, row in current_filtered_products.iterrows():
+                    # Usamos el índice del producto para ciclar entre las 3 columnas
+                    with cols[index % 3]: 
+                        with st.container(border=True):
+                            
+                            relative_path = row['image_path'] # ej: img/nombre.png
+                            
+                            # CONSTRUIR LA URL RAW DE GITHUB para la visualización persistente
+                            # (Asegúrate de tener GITHUB_REPO y GITHUB_BRANCH disponibles globalmente)
+                            # Si no se usa el raw URL, Streamlit Cloud no mostrará la imagen.
+                            raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/{relative_path}"
+                            
+                            # Mostrar la imagen
+                            try:
+                                if relative_path:
+                                    # Usamos la URL RAW para carga persistente
+                                    st.image(raw_url, use_column_width=True) 
+                                else:
+                                    st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
+                            except Exception:
+                                st.image("https://via.placeholder.com/150?text=Error+Cargando", use_column_width=True)
+                            
+                            st.subheader(row['name'])
+                            st.caption(row['category'])
+                            st.write(row['description'])
+                            st.write(f"**Precio: ${row['price']:,.0f}**")
+                            st.write(f"Stock: {row['stock']} un.")
+                            
+                            # Botón "Agregar al Carrito"
+                            # La clave debe ser única por tab si la necesitas, pero row['id'] es suficiente aquí.
+                            if st.button(f"Agregar al Carrito", key=f"btn_{row['id']}"): 
+                                st.session_state.cart.append({"name": row['name'], "price": row['price']})
+                                st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
+                                st.rerun()
+            else:
+                st.info(f"No hay productos disponibles en la categoría: **{tab_name}**.")
 
 # --- MAIN APP ---
 if __name__ == "__main__":
