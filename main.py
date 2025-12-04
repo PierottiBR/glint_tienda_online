@@ -203,23 +203,31 @@ def store_page():
             
             # --- 3. Grid de productos ---
             if not current_filtered_products.empty:
+    
+                # Ordenar por el ID del producto (o 'name' si lo prefieres)
+                current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
+                
                 # Mostrar el grid de productos en 3 columnas
                 cols = st.columns(3) 
                 
+                # INICIALIZAR EL CONTADOR DE COLUMNAS (LO NUEVO)
+                col_index = 0 
+                
                 for index, row in current_filtered_products.iterrows():
-                    # Usamos el índice del producto para ciclar entre las 3 columnas
-                    with cols[index % 3]: 
+                    
+                    # ✅ CORRECCIÓN: Usamos el contador 'col_index' en lugar del 'index' de Pandas
+                    with cols[col_index % 3]: 
                         with st.container(border=True):
                             
                             relative_path = row['image_path']
                             
-                            # CONSTRUIR LA URL RAW DE GITHUB 
+                            # CONSTRUIR LA URL RAW DE GITHUB (Lógica de visualización)
                             raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/{relative_path}"
                             
                             # Mostrar la imagen
                             try:
                                 if relative_path:
-                                    st.image(raw_url, use_column_width=True) 
+                                    st.image(raw_url, use_column_width=True)
                                 else:
                                     st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
                             except Exception:
@@ -231,11 +239,14 @@ def store_page():
                             st.write(f"**Precio: ${row['price']:,.0f}**")
                             st.write(f"Stock: {row['stock']} un.")
                             
-                            # Botón "Agregar al Carrito" (La clave ya está corregida con tab_name)
+                            # Botón "Agregar al Carrito" 
                             if st.button(f"Agregar al Carrito", key=f"btn_{tab_name}_{row['id']}"): 
                                 st.session_state.cart.append({"name": row['name'], "price": row['price']})
                                 st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
                                 st.rerun()
+
+                    # ✅ INCREMENTAR EL CONTADOR DESPUÉS DE DIBUJAR
+                    col_index += 1
             else:
                 st.info(f"No hay productos disponibles en la categoría: **{tab_name}**.")
 
