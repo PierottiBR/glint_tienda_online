@@ -9,5 +9,3 @@ __pycache__/
 *.db
 *.sqlite
 
-# Carpeta de imágenes subidas localmente (No deben ir al repositorio)
-img/
