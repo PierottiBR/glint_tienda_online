@@ -10,7 +10,6 @@ from io import StringIO
 from dotenv import load_dotenv
 load_dotenv()
 
-
 # --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
 st.set_page_config(page_title="Glint Accesorios", layout="wide", page_icon="💎")
 
@@ -97,7 +96,7 @@ def store_page():
             return base64.b64encode(image_file.read()).decode()
 
     # Obtén el base64 del logo (asumiendo que GlintAccesoriosLogo.png existe)
-    banner_base64 = get_base64("Gemini_Generated_Image_fn2rx0fn2rx0fn2r.png")
+    banner_base64 = get_base64("Gemini_Generated_Image_nqljednqljednqlj.png")
     
     # Cargar CSS y reemplazar la variable dinámica
     def load_css(file_name): # ¡QUITAMOS image_base64 como argumento aquí!
