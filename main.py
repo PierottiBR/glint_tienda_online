@@ -84,7 +84,7 @@ def store_page():
             st.subheader(f"Total: ${total:,.0f}")
             
             # Botón de Checkout (WhatsApp)
-            phone_number = "5491112345678" # TU NUMERO AQUI
+            phone_number = "549407404217" # TU NUMERO AQUI
             message = "Hola! Quiero encargar lo siguiente:%0A"
             for index, row in grouped_cart.iterrows():
                 message += f"- {row['cantidad']}x {row['name']} (${row['price']})%0A"
