@@ -7,7 +7,12 @@ from PIL import Image
 import requests
 import base64
 from io import StringIO
+from dotenv import load_dotenv
+load_dotenv()
 
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+GITHUB_BRANCH = os.getenv("GITHUB_BRANCH")
 # --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
 st.set_page_config(page_title="Bijoutery Glam", layout="wide", page_icon="💎")
 

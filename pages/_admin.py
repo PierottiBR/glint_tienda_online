@@ -9,7 +9,12 @@ import requests
 import base64
 from io import StringIO
 import json # Necesario para manejar la respuesta JSON de la API
+from dotenv import load_dotenv
+load_dotenv()
 
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+GITHUB_BRANCH = os.getenv("GITHUB_BRANCH")
 # --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
 st.set_page_config(page_title="Bijoutery Glam - Admin", layout="wide", page_icon="⚙️")
 hide_streamlit_style = """
