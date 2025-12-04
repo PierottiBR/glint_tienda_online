@@ -1,0 +1,13 @@
+# Archivos de configuración sensibles de Streamlit
+.streamlit/secrets.toml
+
+# Carpetas de caché y entornos virtuales
+.venv/
+__pycache__/
+
+# Archivos de bases de datos locales (aunque ya no uses SQLite)
+*.db
+*.sqlite
+
+# Carpeta de imágenes subidas localmente (No deben ir al repositorio)
+img/
