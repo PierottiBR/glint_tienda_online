@@ -128,18 +128,78 @@ def save_products_github(df, commit_message="Actualización de Inventario"):
         st.error(f"Error guardando productos en GitHub: {str(e)}. {error_details}")
         return False
 
-def save_uploaded_file(uploaded_file):
-    # NOTA: En un entorno de producción real, DEBES subir la imagen a un 
-    # servicio de almacenamiento en la nube (S3, Cloudinary) y guardar su URL, 
-    # ya que la carpeta 'img' también es efímera en Streamlit Cloud.
-    # Por ahora, mantenemos la lógica local para el desarrollo:
-    if uploaded_file is not None:
-        file_path = os.path.join(IMG_FOLDER, uploaded_file.name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        return file_path
-    return None
+def upload_image_to_github(repo, token, branch, local_path, github_path, commit_message="Admin panel: Upload image"):
+    """Sube un archivo de imagen codificado en Base64 a GitHub usando la API de Contents."""
+    
+    try:
+        # 1. Leer el contenido binario del archivo local
+        with open(local_path, "rb") as image_file:
+            content = image_file.read()
+    except FileNotFoundError:
+        st.error(f"Error: Archivo de imagen local no encontrado en {local_path}.")
+        return False
+        
+    # 2. Codificar el contenido a Base64
+    content_encoded = base64.b64encode(content).decode('utf-8')
 
+    # 3. Preparar la solicitud
+    url = f"https://api.github.com/repos/{repo}/contents/{github_path}"
+    headers = {"Authorization": f"token {token}"}
+
+    data = {
+        "message": commit_message,
+        "content": content_encoded,
+        "branch": branch
+    }
+
+    # 4. Enviar la solicitud PUT (Crear/Actualizar)
+    try:
+        response = requests.put(url, headers=headers, json=data)
+        response.raise_for_status() 
+        return True
+    except requests.exceptions.HTTPError as http_err:
+        st.error(f"Error HTTP al subir imagen a GitHub: {http_err}. Detalles: {response.text}")
+        return False
+    except Exception as e:
+        st.error(f"Error al subir imagen a GitHub: {str(e)}")
+        return False
+def handle_image_upload(uploaded_file, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER):
+    if uploaded_file is None:
+        return None # No hay archivo para subir
+
+    # 1. GUARDA EL ARCHIVO TEMPORALMENTE EN LA CARPETA LOCAL (Necesario para leer el binario)
+    file_name = uploaded_file.name
+    local_path = os.path.join(IMG_FOLDER, file_name)
+    
+    try:
+        with open(local_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+    except Exception as e:
+        st.error(f"Error al guardar el archivo local: {e}")
+        return None
+
+    # 2. SUBIR LA IMAGEN A GITHUB
+    github_path = local_path # La ruta en GitHub será 'img/nombre.png'
+    
+    upload_success = upload_image_to_github(
+        repo=GITHUB_REPO,
+        token=GITHUB_TOKEN,
+        branch=GITHUB_BRANCH,
+        local_path=local_path,
+        github_path=github_path,
+        commit_message=f"Admin: Upload image {file_name}"
+    )
+
+    # 3. LIMPIAR EL ARCHIVO LOCAL (Si la subida fue exitosa, ya no lo necesitamos)
+    if upload_success and os.path.exists(local_path):
+        os.remove(local_path) 
+        
+    if upload_success:
+        # Devolver la ruta relativa (ej: img/producto.png) que se guardará en el CSV
+        return github_path 
+    else:
+        st.error("La imagen falló al subir a GitHub. Producto NO guardado.")
+        return False # Devolvemos False para señalar un fallo
 # --- CARGA INICIAL DE DATOS ---
 if 'products_df' not in st.session_state:
     st.session_state['products_df'] = load_products_github()
@@ -182,7 +242,15 @@ with tab1:
             
         if submitted:
             if name and price > 0:
-                img_path = save_uploaded_file(image)
+                
+                # LLAMADA A LA FUNCIÓN UNIFICADA
+                img_path = handle_image_upload(image, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER)
+                
+                # Verificar si el manejo de la imagen falló (devuelve False)
+                if img_path is False:
+                    # El mensaje de error ya se mostró dentro de handle_image_upload
+                    st.warning(f"Producto '{name}' no guardado debido a un error de subida de imagen.")
+                    st.stop() # Detenemos la ejecución
                 
                 # Calcular el nuevo ID
                 next_id = df['id'].max() + 1 if not df.empty and df['id'].max() is not None else 1
@@ -193,7 +261,8 @@ with tab1:
                     'category': category, 
                     'price': price, 
                     'stock': stock, 
-                    'image_path': img_path if img_path else "", # Guardar la ruta local o URL de la imagen
+                    # Guarda la ruta devuelta por handle_image_upload (puede ser None si no hay foto)
+                    'image_path': img_path if img_path else "", 
                     'description': desc
                 }])
                 
@@ -204,6 +273,8 @@ with tab1:
                     st.session_state['products_df'] = updated_df # Actualizar sesión
                     st.success(f"Producto '{name}' agregado correctamente y guardado en GitHub.")
                     st.rerun()
+                else:
+                    st.error("El producto no pudo guardarse en el CSV de GitHub.")
             else:
                 st.error("El nombre y el precio son obligatorios.")
 
