@@ -1,123 +1,150 @@
+# 🛍️_Tienda.py
+
 import streamlit as st
-import base64
-
-st.set_page_config(page_title="Glint Accesorios", page_icon=":stars:", layout="wide")
-
-# === Cargar imagen PNG y convertir a base64 ===
-logo_path = "GlintAccesoriosLogo.png"  # tu imagen
-with open(logo_path, "rb") as f:
-    logo_base64 = base64.b64encode(f.read()).decode()
-
-# === Mostrar logo centrado ===
-st.markdown(
-    f"""
-    <style>
-        .contenedor {{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: transparent !important;
-        }}
-        .imagen-banner {{
-            width: 30%;
-            height: auto;
-            background-color: transparent !important;
-        }}
-        /* Quitar fondo oscuro general */
-        [data-testid="stAppViewContainer"] {{
-            background-color: Black !important;
-        }}
-    </style>
-    <div class="contenedor">
-        <img src="data:image/png;base64,{logo_base64}" class="imagen-banner" alt="banner">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# === Mostrar título sin clamp ni ícono ===
-st.markdown(
-    """
-    <p style='text-align: center; color: #d4af37; font-weight: 800; font-size: 2rem; margin-top: 15px;'>
-        Glint Accesorios
-    </p>
-    """,
-    unsafe_allow_html=True
-)
-
-
+import sqlite3
+import pandas as pd
+import os
 from PIL import Image
+# import shutil # shutil ya no es necesario si no borras archivos
 
-# Función para ajustar imágenes al mismo tamaño y centrar
-def ajustar_imagen(path, size=(300, 300)):
-    img = Image.open(path)
-    img.thumbnail(size)  # mantiene proporción
-    fondo = Image.new("RGBA", size, (255, 255, 255, 0))  # fondo transparente
-    x = (size[0] - img.width) // 2
-    y = (size[1] - img.height) // 2
-    fondo.paste(img, (x, y), img if img.mode == 'RGBA' else None)
-    return fondo
+# --- CONFIGURACIÓN INICIAL ---
+st.set_page_config(page_title="Bijoutery Glam", layout="wide", page_icon="💎")
+DB_NAME = "bijoutery.db"
+IMG_FOLDER = "img"
 
-# Lista de productos con id
-productos = [
-    {
-        "id": "aros_cubanos",
-        "imagen": "accesorios/aros/aroscubanos.png",
-        "nombre": "Aros Cubanos",
-        "detalles": ["• 1,5 Cm", "• Acero dorado"],
-        "url": "https://wa.me/5493407404217?text=Hola,%20estoy%20interesado%20en%20el%20aros%20cubanos"
-    },
-    {
-        "id": "aros_flor",
-        "imagen": "accesorios/aros/arosflor.png",
-        "nombre": "Aros Flor",
-        "detalles": ["• 1,5 Cm", "• Acero dorado"],
-        "url": "https://wa.me/5493407404217?text=Hola,%20estoy%20interesado%20en%20el%20aros%20flor"
-    },
-    {
-        "id": "aros_cereza",
-        "imagen": "accesorios/aros/aroscereza.png",
-        "nombre": "Aros Cereza",
-        "detalles": ["• 1,5 Cm", "• Acero dorado"],
-        "url": "https://wa.me/5493407404217?text=Hola,%20estoy%20interesado%20en%20el%20aros%20cereza"
-    }
-]
+# Asegurar que existe la carpeta de imágenes (para desarrollo local)
+if not os.path.exists(IMG_FOLDER):
+    os.makedirs(IMG_FOLDER)
 
-# Crear columnas
-col1, col2, col3 = st.columns(3)
+# --- FUNCIONES DE BASE DE DATOS (Mantenidas por ahora) ---
+# ... (deja todas tus funciones init_db y run_query aquí, son compartidas) ...
+def init_db():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT,
+            price REAL,
+            stock INTEGER,
+            image_path TEXT,
+            description TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# Columna 1
-with col1:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_cubanos")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"], use_container_width=True)
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+def run_query(query, params=(), return_data=False):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute(query, params)
+    if return_data:
+        data = c.fetchall()
+        columns = [desc[0] for desc in c.description]
+        conn.close()
+        return pd.DataFrame(data, columns=columns)
+    conn.commit()
+    conn.close()
 
-# Columna 2
-with col2:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_flor")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],use_container_width=True)
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+# --- FUNCIONES AUXILIARES ---
+# ... (deja tu función save_uploaded_file aquí) ...
+def save_uploaded_file(uploaded_file):
+    if uploaded_file is not None:
+        file_path = os.path.join(IMG_FOLDER, uploaded_file.name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        return file_path
+    return None
 
-# Columna 3
-with col3:
-    contenedor = st.container(border=True)
-    with contenedor:
-        prod = next(p for p in productos if p["id"] == "aros_cereza")
-        img = ajustar_imagen(prod["imagen"])
-        st.image(img, caption=prod["nombre"],use_container_width=True)
-        st.write(f"**{prod['nombre']}**")
-        for detalle in prod["detalles"]:
-            st.write(detalle)
-        st.link_button(label="Comprar", url=prod["url"],use_container_width=True)
+
+# --- INTERFAZ: TIENDA (CLIENTE) ---
+def store_page():
+    st.title("💎 Tienda de Bijoutery & Accesorios")
+    
+    # Inicializar carrito
+    if 'cart' not in st.session_state:
+        st.session_state.cart = []
+
+    # Sidebar - Carrito
+    with st.sidebar:
+        st.header("🛒 Tu Carrito")
+        if len(st.session_state.cart) > 0:
+            total = 0
+            cart_df = pd.DataFrame(st.session_state.cart)
+            # Agrupar por producto para mostrar cantidad
+            grouped_cart = cart_df.groupby(['name', 'price']).size().reset_index(name='cantidad')
+            
+            for index, row in grouped_cart.iterrows():
+                subtotal = row['price'] * row['cantidad']
+                st.write(f"**{row['cantidad']}x** {row['name']} - ${subtotal:,.0f}")
+                total += subtotal
+            
+            st.divider()
+            st.subheader(f"Total: ${total:,.0f}")
+            
+            # Botón de Checkout (WhatsApp)
+            phone_number = "5491112345678" # TU NUMERO AQUI
+            message = "Hola! Quiero encargar lo siguiente:%0A"
+            for index, row in grouped_cart.iterrows():
+                message += f"- {row['cantidad']}x {row['name']} (${row['price']})%0A"
+            message += f"%0ATotal: ${total}"
+            
+            whatsapp_url = f"https://wa.me/{phone_number}?text={message}"
+            st.link_button("📲 Enviar Pedido por WhatsApp", whatsapp_url)
+            
+            if st.button("Vaciar Carrito"):
+                st.session_state.cart = []
+                st.rerun()
+        else:
+            st.info("El carrito está vacío.")
+
+    # Filtros
+    # Asegúrate de que init_db se ejecute si es la primera vez
+    init_db() 
+    categories = ["Todas"] + [r[0] for r in run_query("SELECT DISTINCT category FROM products", return_data=True).values.tolist()]
+    selected_cat = st.selectbox("Filtrar por categoría", categories)
+
+    query = "SELECT * FROM products WHERE stock > 0"
+    params = ()
+    if selected_cat != "Todas":
+        query += " AND category = ?"
+        params = (selected_cat,)
+    
+    products = run_query(query, params, return_data=True)
+
+    # Grid de productos
+    if not products.empty:
+        cols = st.columns(3) # 3 columnas por fila
+        for index, row in products.iterrows():
+            with cols[index % 3]:
+                with st.container(border=True):
+                    # Mostrar imagen si existe
+                    if row['image_path'] and os.path.exists(row['image_path']):
+                        try:
+                            image = Image.open(row['image_path'])
+                            st.image(image, use_column_width=True)
+                        except:
+                            st.error("Error cargando imagen")
+                    else:
+                        st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
+                    
+                    st.subheader(row['name'])
+                    st.caption(row['category'])
+                    st.write(row['description'])
+                    st.write(f"**Precio: ${row['price']:,.0f}**")
+                    st.write(f"Stock: {row['stock']} un.")
+                    
+                    if st.button(f"Agregar al Carrito", key=f"btn_{row['id']}"):
+                        st.session_state.cart.append({"name": row['name'], "price": row['price']})
+                        st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
+                        st.rerun()
+    else:
+        st.info("No hay productos disponibles en esta categoría.")
+
+# --- MAIN APP (MODIFICADO) ---
+if __name__ == "__main__":
+    init_db() # Asegura que la DB exista al inicio de la app
+    st.sidebar.image("https://cdn-icons-png.flaticon.com/512/6491/6491546.png", width=100)
+    # Ya no necesitas el radio button de navegación, Streamlit lo hace automáticamente
+    store_page()
