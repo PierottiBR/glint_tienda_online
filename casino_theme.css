@@ -1,47 +1,40 @@
 /* Fuentes Google */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap');
 
+/* === VARIABLES DE COLOR === */
+:root {
+    --color-background-main: #1C1C1C;    /* Negro Profundo / Carbón */
+    --color-accent-gold: #FFC72C;        /* Dorado Brillante */
+    --color-dark-surface: #2E2E2E;       /* Gris Oscuro para Tablas/Inputs */
+    --color-button-base: #B0E0E6;        /* Azul Pálido de acento */
+    --color-button-end: #7A5AF8;         /* Púrpura Suave */
+    --color-border-soft: #454545;        /* Gris Acero Suave */
+    --color-contrast-text: #FFFFFF;      /* Blanco */
+    --color-contrast-dark: #000000;      /* Negro */
+}
+
+/* === CONFIGURACIÓN GLOBAL Y FONDO === */
+
 /* Títulos */
 .stMarkdown h1 {
     font-family: 'Playfair Display', serif !important;
-    color: #FFD700 !important; /* Dorado */
+    color: var(--color-accent-gold) !important;
     text-align: center !important;
-    border-bottom: 3px solid #8B0000 !important; /* Rojo oscuro */
+    border-bottom: 2px solid var(--color-border-soft) !important;
     margin-bottom: 10px !important;
-    text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700 !important;
+    text-shadow: 0 0 10px var(--color-accent-gold), 0 0 20px rgba(255, 199, 44, 0.5) !important;
     animation: glow 2s ease-in-out infinite alternate !important;
 }
 @keyframes glow {
-    from { text-shadow: 0 0 5px #FFD700; }
-    to { text-shadow: 0 0 15px #FFD700, 0 0 20px #8B0000; }
-}
-
-/* Contenedor principal centrado */
-.contenedor-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-/* Imagen con estilos y efecto */
-.imagen-logo {
-    height: 120px;
-    border-radius: 10px;
-}
-
-/* Título con formato */
-.h1-crear-usuario {
-    font-size: 2rem;
-    color: #FFFFFF;
-    text-align: center;
+    from { text-shadow: 0 0 5px var(--color-accent-gold); }
+    to { text-shadow: 0 0 15px var(--color-accent-gold), 0 0 20px var(--color-dark-surface); }
 }
 
 /* Subtítulos */
 .stMarkdown h2 {
     font-family: 'Playfair Display', serif !important;
     font-size: 28px !important;
-    color: #FFD700 !important; /* Dorado */
+    color: var(--color-accent-gold) !important;
     text-align: center !important;
     margin-bottom: 0px !important;
 }
@@ -49,345 +42,130 @@
 .stMarkdown h3 {
     font-family: 'Playfair Display', serif !important;
     font-size: 22px !important;
-    color: #FFFFFF !important; /* Blanco */
+    color: var(--color-contrast-text) !important;
     text-align: center !important;
     margin-bottom: 0px !important;
 }
 
-/* Botones */
+/* --- LOGO Y BANNER (Corregido para Transparencia) --- */
+.contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin: 0 auto;
+    background-color: transparent !important; /* FORZAR TRANSPARENCIA */
+}
+.imagen-banner {
+    padding: 0;
+    max-height: 200px; 
+    width: auto;
+    height: auto;
+    background-color: transparent !important; /* FORZAR TRANSPARENCIA */
+}
+
+/* --- BOTONES --- */
 button.stButton > button,
-div.stButton > button {
-    background: linear-gradient(135deg, #8063ff 0%, #00FFFF 100%) !important;
-    color: white !important;
+div.stButton > button,
+div[data-testid="stFormSubmitButton"] button,
+.custom-button {
+    /* Gradiente con tonos de púrpura/azul claro */
+    background: linear-gradient(135deg, var(--color-button-end) 0%, var(--color-button-base) 100%) !important;
+    color: var(--color-contrast-text) !important;
     font-weight: bold !important;
-    border: 2px solid #8063ff !important;
+    border: 1px solid var(--color-button-end) !important; /* Borde más sutil */
     transition: all 0.3s !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 button.stButton > button:hover,
-div.stButton > button:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important; /* Sombra dorada */
+div.stButton > button:hover,
+div[data-testid="stFormSubmitButton"] button:hover,
+.custom-button:hover {
+    transform: scale(1.03) !important;
+    box-shadow: 0 6px 15px rgba(255, 199, 44, 0.4) !important; /* Sombra dorada suave */
 }
 
 /* Botón Ir A JUGAR */
 .btn-jugar {
-    background: linear-gradient(135deg, #8063ff 0%, #00FFFF 100%) !important;
-    color: white !important;
+    background: linear-gradient(135deg, var(--color-button-end) 0%, var(--color-button-base) 100%) !important;
+    color: var(--color-contrast-text) !important;
     font-weight: bold !important;
-    border: 2px solid #8063ff !important;
+    border: 1px solid var(--color-button-end) !important;
     padding: 5px !important;
     font-size: 16px !important;
     border-radius: 4px !important;
     text-align: center !important;
     display: inline-block !important;
-    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
     width: 30% !important;
 }
 
-.btn-jugar:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important;
-}
 
-/* Generar Pago Button */
-div[data-testid="stFormSubmitButton"] button {
-    background: linear-gradient(135deg, #8063ff 0%, #00FFFF 100%) !important;
-    color: white !important;
-    font-weight: bold !important;
-    border: 2px solid #8063ff !important;
-    padding: 10px 15px !important;
-    font-size: 16px !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    text-decoration: none !important;
-    display: inline-block !important;
-    box-shadow: 0 4px 8px rgba(255, 0, 255, 0.3) !important;
-    transition: all 0.3s ease-in-out !important;
-}
-
-div[data-testid="stFormSubmitButton"] button:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important;
-}
-
-/* Botón IR A PAGAR */
-.custom-button {
-    background: linear-gradient(135deg, #8063ff 0%, #00FFFF 100%) !important;
-    color: white !important;
-    font-weight: bold !important;
-    border: 2px solid #8063ff !important;
-    transition: all 0.3s !important;
-    padding: 10px 20px !important;
-    font-size: 16px !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    text-decoration: none !important;
-    display: inline-block !important;
-}
-
-.custom-button:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important; /* Sombra dorada */
-}
-/* Inputs */
+/* --- INPUTS Y SELECCIONES --- */
 .stTextInput input, 
 .stNumberInput input,
-.stSelectbox select {
-    background: #00000067 !important; /* Negro */
-    color: #8063ff !important; /* Dorado */
-    border: 2px solid #8063ff !important; /* Rojo oscuro */
+div.stSelectbox > div[data-baseweb="select"] {
+    background: var(--color-dark-surface) !important; 
+    color: var(--color-accent-gold) !important;
+    border: 1px solid var(--color-border-soft) !important;
 }
+.stTextInput > label,
+.stNumberInput > label {
+    color: #AAAAAA !important; /* Texto de la etiqueta */
+}
+
+
+/* --- TABS --- */
+.stTabs [role="tablist"] {
+    background: var(--color-dark-surface) !important;
+    border-bottom: 2px solid var(--color-border-soft) !important;
+}
+
+.stTabs [aria-selected="true"] {
+    color: var(--color-accent-gold) !important;
+    background: var(--color-background-main) !important;
+    border-top: 2px solid var(--color-accent-gold) !important;
+    border-left: 1px solid var(--color-border-soft) !important;
+    border-right: 1px solid var(--color-border-soft) !important;
+}
+
+.stTabs [role="tab"] {
+    color: #AAAAAA !important; 
+    background: var(--color-dark-surface) !important;
+}
+
+/* --- OTROS ELEMENTOS DE ESTILO --- */
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    background: #000000 !important; /* Fondo negro */
-    border-right: 3px solid #FFD700 !important; /* Dorado */
+    background: var(--color-dark-surface) !important;
+    border-right: 3px solid var(--color-accent-gold) !important;
 }
 
 /* Tablas */
 .stDataFrame {
-    background: rgba(139, 0, 0, 0.8) !important; /* Rojo oscuro translúcido */
-    color: #FFFFFF !important; /* Texto blanco */
+    background: var(--color-dark-surface) !important;
+    color: var(--color-contrast-text) !important; 
 }
 
-/* Notificaciones */
-.stAlert {
-    background: rgba(255, 215, 0, 0.2) !important; /* Fondo dorado translúcido */
-    border-left: 4px solid #FFD700 !important; /* Dorado */
-    color: #FFFFFF !important; /* Texto blanco */
-}
-
-/* Efectos especiales */
-.special-text {
-    color: #FFD700 !important; /* Dorado */
-    text-shadow: 0 0 8px rgba(139, 0, 0, 0.7) !important; /* Sombra rojo oscuro */
-}
-
-/* Tabs */
-.stTabs [role="tablist"] {
-    background: #a7b3dd93 !important;
-    border-bottom: 2px solid #3600cc !important; /* Dorado */
-}
-
-.stTabs [role="tab"] {
-    color: #030300 !important; /* Dorado */
-    background: transparent !important;
-}
-
-.stTabs [aria-selected="true"] {
-    color: #ffffff !important; /* Texto negro */
-    background: #000766 !important; /* Dorado */
-}
-
-/* Footer compacto */
-.footer-compacto {
-    position: relative;
-    width: 100%;
-    background: rgba(26, 30, 30, 0.95) !important;
-    color: #FFFFFF !important;
-    padding: 15px 10px !important;
-    text-align: center !important;
-    margin: 0 !important;
-    border-top: 2px solid #B0E0E6 !important;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.footer-compacto a {
-    color: #FFFFFF !important;
-    text-decoration: none !important;
-    font-weight: bold !important;
-}
-
-.footer-compacto a:hover {
-    text-decoration: underline !important;
-    color: #B0E0E6 !important;
-}
-
-.insignia-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.imagen-footer {
-    max-width: 80px !important;
-    height: auto !important;
-    border-radius: 4px;
-}
-
-/* Eliminar TODOS los espacios de Streamlit */
-div.stMarkdown:has(div.footer-compacto) {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-section[data-testid="stMain"] .block-container {
-    padding-bottom: 0 !important;
-}
-
-/*BACKGROUND*/
+/* BACKGROUND Principal */
 [data-testid="stAppViewContainer"] {
+    background-color: var(--color-background-main); /* Establecer el color principal */
     background-image: url("data:image/png;base64,{image_base64}");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    padding-top: 0 !important;
-    margin-top: 0 !important;
 }
 
-[data-testid="stVerticalBlock"] {
-    gap: 0 !important;
-}
-
-header[data-testid="stHeader"] {
-    display: none !important;
-}
-
+/* Eliminar espacios y gaps de Streamlit */
 div.block-container {
     padding-top: 0 !important;
 }
-
-/*BANNER*/
-.contenedor {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    margin: 0 auto;
+header[data-testid="stHeader"] {
+    display: none !important;
 }
-.imagen-banner {
-    padding: 10px;
-    max-height: 300px;  /* ajusta aquí la altura máxima */
-    width: auto;
-    height: auto;
-}
-
-/* Tarjeta centrada con efecto */
-.div-tarjeta {
-    display: flex;
-    justify-content: center;
-    align-items: center; 
-    height: 100%;
-}
-
-/* TARJETA 🔽🔽🔽🔽🔽🔽 */
-/* Botón de la tarjeta con efecto de lujo */
-.a-tarjeta {
-    display: inline-block;
-    text-align: center;
-    background-color: #000000 !important; /* Negro profundo */
-    color: #FFD700 !important; /* Dorado */
-    font-size: 14px !important;
-    font-weight: bold !important;
-    padding: 10px 15px !important;
-    border-radius: 50px !important;
-    text-decoration: none !important;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8) !important; /* Sombra dorada */
-    margin: 5px !important; /* Ajuste de márgenes */
-    border: 2px solid #8B0000 !important; /* Borde rojo oscuro */
-    transition: all 0.3s ease-in-out !important;
-}
-
-/* Efecto de brillo al pasar el mouse */
-.a-tarjeta:hover {
-    background-color: #FFD700 !important; /* Dorado */
-    color: #000000 !important; /* Negro profundo */
-    box-shadow: 0 0 20px rgba(139, 0, 0, 0.8) !important; /* Sombra rojo oscuro */
-    transform: scale(1.1) !important;
-}
-/* TARJETA 🔼🔼🔼🔼 */
-
-/* === GUÍA DE USO === */
-/* Contenedor principal del header */
-.guia-container {
-    background: rgba(0, 0, 0, 0.65); /* negro semitransparente */
-    border-radius: 20px;
-    padding: 40px;
-    color: white !important;
-    backdrop-filter: blur(8px); /* efecto glass */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-    margin-top: 25px;
-    margin-bottom: 20px;
-}
-
-/* Contenedor para el contenido de cada tab */
-.guia-content-container {
-    background: rgba(0, 0, 0, 0.65); /* negro semitransparente */
-    border-radius: 20px;
-    padding: 40px;
-    color: white !important;
-    backdrop-filter: blur(8px); /* efecto glass */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-    margin-top: 20px;
-    margin-bottom: 50px;
-}
-
-/* Contenido dentro de los contenedores */
-.guia-content h1,
-.guia-content h2,
-.guia-content h3,
-.guia-content h4,
-.guia-content h5,
-.guia-content h6,
-.guia-content p,
-.guia-content li,
-.guia-content strong {
-    color: #FFFFFF !important;
-}
-
-/* Estilos específicos para el contenido */
-.guia-content h3 {
-    margin-bottom: 25px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    padding-bottom: 10px;
-}
-
-.guia-content ol,
-.guia-content ul {
-    margin-left: 20px;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.guia-content li {
-    margin-bottom: 12px;
-    padding-left: 8px;
-}
-
-.guia-content strong {
-    color: #00FFFF !important;
-    font-weight: bold;
-}
-
-/* Imágenes y videos */
-.guia-content-container img, 
-.guia-content-container video {
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-    margin-top: 15px;
-    margin-bottom: 20px;
-    max-width: 100%;
-}
-
-/* Animaciones */
-.guia-container,
-.guia-content-container {
-    animation: fadeIn 0.8s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+div[data-testid="stVerticalBlock"] {
+    gap: 0 !important;
 }
