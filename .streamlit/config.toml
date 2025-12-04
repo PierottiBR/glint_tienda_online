@@ -4,4 +4,5 @@ primaryColor="#efe25f"
 backgroundColor="#000000"
 secondaryBackgroundColor="#24252b"
 font="serif"
-
+[client]
+showSidebarNavigation = false
