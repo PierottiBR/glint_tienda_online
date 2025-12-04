@@ -226,12 +226,43 @@ tab1, tab2 = st.tabs(["➕ Agregar Producto", "📝 Editar/Eliminar Inventario"]
 # --- Pestaña 1: Agregar Producto ---
 with tab1:
     st.subheader("Nuevo Producto")
+    
+    # 1. DEFINIMOS LA ESTRUCTURA DE CATEGORÍAS
+    # Esto organiza qué subcategorías pertenecen a qué material
+    CATEGORIAS_ESTRUCTURA = {
+        "Acero Blanco": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+        "Acero Dorado": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+        "Acero Quirúrgico": ["Aros", "Pulseras", "Collares", "Dijes"],
+        "Plata": ["Aros"],
+        "Pañuelos": [],       # Sin subcategorías
+        "Complementos": []    # Sin subcategorías
+    }
+
     with st.form("add_product_form", clear_on_submit=True):
         col1, col2 = st.columns(2)
+        
         with col1:
             name = st.text_input("Nombre del producto")
-            category = st.selectbox("Categoría", ["Collares", "Pulseras", "Anillos", "Aros", "Conjuntos"])
+            
+            # --- NUEVA LÓGICA DE CATEGORÍAS ---
+            # Selector 1: Material o Línea principal
+            main_category = st.selectbox("Material / Línea", options=list(CATEGORIAS_ESTRUCTURA.keys()))
+            
+            # Buscamos las opciones correspondientes a la selección
+            sub_options = CATEGORIAS_ESTRUCTURA[main_category]
+            
+            # Selector 2: Solo aparece si hay subcategorías (ej. Pañuelos no tiene)
+            if sub_options:
+                sub_category = st.selectbox("Tipo de producto", options=sub_options)
+                # Combinamos para guardar en el CSV: "Acero Blanco - Aros"
+                category_final = f"{main_category} - {sub_category}"
+            else:
+                # Si no hay subcategoría, se guarda solo el nombre principal
+                category_final = main_category
+            # ----------------------------------
+
             price = st.number_input("Precio ($)", min_value=0.0, step=100.0)
+            
         with col2:
             stock = st.number_input("Stock Inicial", min_value=0, step=1)
             desc = st.text_area("Descripción")
@@ -245,11 +276,10 @@ with tab1:
                 # LLAMADA A LA FUNCIÓN UNIFICADA
                 img_path = handle_image_upload(image, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER)
                 
-                # Verificar si el manejo de la imagen falló (devuelve False)
+                # Verificar si el manejo de la imagen falló
                 if img_path is False:
-                    # El mensaje de error ya se mostró dentro de handle_image_upload
                     st.warning(f"Producto '{name}' no guardado debido a un error de subida de imagen.")
-                    st.stop() # Detenemos la ejecución
+                    st.stop()
                 
                 # Calcular el nuevo ID
                 next_id = df['id'].max() + 1 if not df.empty and df['id'].max() is not None else 1
@@ -257,10 +287,10 @@ with tab1:
                 new_product = pd.DataFrame([{
                     'id': next_id,
                     'name': name, 
-                    'category': category, 
+                    # AQUÍ USAMOS LA CATEGORÍA COMBINADA
+                    'category': category_final, 
                     'price': price, 
                     'stock': stock, 
-                    # Guarda la ruta devuelta por handle_image_upload (puede ser None si no hay foto)
                     'image_path': img_path if img_path else "", 
                     'description': desc
                 }])
@@ -269,25 +299,22 @@ with tab1:
                 updated_df = pd.concat([df, new_product], ignore_index=True)
                 
                 # Guardamos y capturamos la respuesta de GitHub
-                github_response = save_products_github(updated_df, f"Añadido producto: {name}")
+                github_response = save_products_github(updated_df, f"Añadido producto: {name} ({category_final})")
                 
                 if github_response is not False:
-                    # Si fue exitoso, el response contiene el commit
                     commit_sha = github_response.get("commit", {}).get("sha", "N/A")
                     commit_url = github_response.get("commit", {}).get("html_url", "#")
-                    commit_message = github_response.get("commit", {}).get("message", "Actualización de archivo CSV.")
+                    commit_message = github_response.get("commit", {}).get("message", "Actualización.")
                     
-                    st.session_state['products_df'] = updated_df # Actualizar sesión
+                    st.session_state['products_df'] = updated_df 
                     
-                    # --- MENSAJE DE ÉXITO DETALLADO ---
                     st.success(f"🎉 **Producto '{name}' agregado con éxito!**")
                     st.markdown(f"""
-                        **Datos guardados en GitHub:**
-                        * **Commit SHA:** `{commit_sha[:7]}`
-                        * **Mensaje:** `{commit_message}`
+                        **Detalles:**
+                        * **Categoría:** {category_final}
+                        * **Commit:** `{commit_sha[:7]}`
                         * [Ver Commit en GitHub]({commit_url})
                     """)
-                    # -----------------------------------
                     
                     st.rerun()
                 else:
