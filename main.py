@@ -97,7 +97,7 @@ def store_page():
             return base64.b64encode(image_file.read()).decode()
 
     # Obtén el base64 del logo (asumiendo que GlintAccesoriosLogo.png existe)
-    banner_base64 = get_base64("GlintAccesoriosLogo.png")
+    banner_base64 = get_base64("Gemini_Generated_Image_fn2rx0fn2rx0fn2r.png")
     
     # Cargar CSS y reemplazar la variable dinámica
     def load_css(file_name): # ¡QUITAMOS image_base64 como argumento aquí!
