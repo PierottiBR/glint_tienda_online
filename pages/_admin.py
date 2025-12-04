@@ -118,14 +118,13 @@ def save_products_github(df, commit_message="Actualización de Inventario"):
         put_response.raise_for_status()
         
         # Actualizar SHA para futuras operaciones
-        st.session_state['products_sha'] = put_response.json().get("content", {}).get("sha")
+        response_json = put_response.json() # Capturamos la respuesta JSON
+        st.session_state['products_sha'] = response_json.get("content", {}).get("sha")
 
-        return True
+        # CAMBIAR: Devolver la respuesta JSON
+        return response_json 
     except Exception as e:
-        error_details = ""
-        if 'put_response' in locals():
-             error_details = f"Detalles: {put_response.text}"
-        st.error(f"Error guardando productos en GitHub: {str(e)}. {error_details}")
+        # ... (código de manejo de error existente) ...
         return False
 
 def upload_image_to_github(repo, token, branch, local_path, github_path, commit_message="Admin panel: Upload image"):
@@ -269,9 +268,27 @@ with tab1:
                 # Concatenar y guardar
                 updated_df = pd.concat([df, new_product], ignore_index=True)
                 
-                if save_products_github(updated_df, f"Añadido producto: {name}"):
+                # Guardamos y capturamos la respuesta de GitHub
+                github_response = save_products_github(updated_df, f"Añadido producto: {name}")
+                
+                if github_response is not False:
+                    # Si fue exitoso, el response contiene el commit
+                    commit_sha = github_response.get("commit", {}).get("sha", "N/A")
+                    commit_url = github_response.get("commit", {}).get("html_url", "#")
+                    commit_message = github_response.get("commit", {}).get("message", "Actualización de archivo CSV.")
+                    
                     st.session_state['products_df'] = updated_df # Actualizar sesión
-                    st.success(f"Producto '{name}' agregado correctamente y guardado en GitHub.")
+                    
+                    # --- MENSAJE DE ÉXITO DETALLADO ---
+                    st.success(f"🎉 **Producto '{name}' agregado con éxito!**")
+                    st.markdown(f"""
+                        **Datos guardados en GitHub:**
+                        * **Commit SHA:** `{commit_sha[:7]}`
+                        * **Mensaje:** `{commit_message}`
+                        * [Ver Commit en GitHub]({commit_url})
+                    """)
+                    # -----------------------------------
+                    
                     st.rerun()
                 else:
                     st.error("El producto no pudo guardarse en el CSV de GitHub.")
