@@ -173,10 +173,6 @@ def store_page():
     # Filtrar solo productos con stock > 0
     available_products = products_df[products_df['stock'] > 0]
     
-    # ----------------------------------------------------
-    # CAMBIO: REEMPLAZAR st.selectbox por st.tabs
-    # ----------------------------------------------------
-    
     # Obtener todas las categorías disponibles y únicas
     all_categories = available_products['category'].dropna().unique().tolist()
     tab_names = ["Todas"] + all_categories 
@@ -192,14 +188,20 @@ def store_page():
             
             # --- Lógica de Filtrado ---
             if tab_name == "Todas":
-                # Si es la pestaña "Todas", muestra todos los productos disponibles
                 current_filtered_products = available_products
             else:
-                # Si es una categoría específica, filtra el DataFrame
                 current_filtered_products = available_products[available_products['category'] == tab_name]
             
             
-            # --- 3. Grid de productos (Ajustado para el tab actual) ---
+            # ----------------------------------------------------
+            # ✅ CORRECCIÓN DE ORDENAMIENTO: Ordenar por ID o Nombre
+            # ----------------------------------------------------
+            if not current_filtered_products.empty:
+                # Ordenar por el ID del producto (asumiendo que ID = orden de creación)
+                current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
+            
+            
+            # --- 3. Grid de productos ---
             if not current_filtered_products.empty:
                 # Mostrar el grid de productos en 3 columnas
                 cols = st.columns(3) 
@@ -209,17 +211,14 @@ def store_page():
                     with cols[index % 3]: 
                         with st.container(border=True):
                             
-                            relative_path = row['image_path'] # ej: img/nombre.png
+                            relative_path = row['image_path']
                             
-                            # CONSTRUIR LA URL RAW DE GITHUB para la visualización persistente
-                            # (Asegúrate de tener GITHUB_REPO y GITHUB_BRANCH disponibles globalmente)
-                            # Si no se usa el raw URL, Streamlit Cloud no mostrará la imagen.
+                            # CONSTRUIR LA URL RAW DE GITHUB 
                             raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/{relative_path}"
                             
                             # Mostrar la imagen
                             try:
                                 if relative_path:
-                                    # Usamos la URL RAW para carga persistente
                                     st.image(raw_url, use_column_width=True) 
                                 else:
                                     st.image("https://via.placeholder.com/150?text=Sin+Foto", use_column_width=True)
@@ -232,9 +231,8 @@ def store_page():
                             st.write(f"**Precio: ${row['price']:,.0f}**")
                             st.write(f"Stock: {row['stock']} un.")
                             
-                            # Botón "Agregar al Carrito"
-                            # La clave debe ser única por tab si la necesitas, pero row['id'] es suficiente aquí.
-                            if st.button(f"Agregar al Carrito", key=f"btn_{tab_name}_{row['id']}"):
+                            # Botón "Agregar al Carrito" (La clave ya está corregida con tab_name)
+                            if st.button(f"Agregar al Carrito", key=f"btn_{tab_name}_{row['id']}"): 
                                 st.session_state.cart.append({"name": row['name'], "price": row['price']})
                                 st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
                                 st.rerun()
