@@ -3,38 +3,38 @@
 
 /* === VARIABLES DE COLOR === */
 :root {
-    --color-background-main: #1C1C1C;    /* Negro Profundo / Carbón */
-    --color-accent-gold: #FFC72C;        /* Dorado Brillante */
-    --color-dark-surface: #2E2E2E;       /* Gris Oscuro para Tablas/Inputs */
-    --color-button-base: #B0E0E6;        /* Azul Pálido de acento */
-    --color-button-end: #7A5AF8;         /* Púrpura Suave */
-    --color-border-soft: #454545;        /* Gris Acero Suave */
+    --color-background-main: #1A1A1A;    /* Negro Obsidiana */
+    --color-accent-main: #FFB7C5;        /* Rosa Oro (Rose Gold) - Color principal de acento */
+    --color-light-accent: #E8E8E8;       /* Gris Perla Suave */
+    --color-dark-surface: #2C2C2C;       /* Gris Oscuro para Tablas/Inputs */
+    --color-button-base: #FFB7C5;        /* Rosa Oro para botones */
+    --color-button-end: #CC99A6;         /* Tono más oscuro de Rose Gold */
+    --color-border-soft: #4A4A4A;        /* Gris Sombra Suave */
     --color-contrast-text: #FFFFFF;      /* Blanco */
     --color-contrast-dark: #000000;      /* Negro */
 }
 
-/* === CONFIGURACIÓN GLOBAL Y FONDO === */
-
 /* Títulos */
 .stMarkdown h1 {
     font-family: 'Playfair Display', serif !important;
-    color: var(--color-accent-gold) !important;
+    color: var(--color-accent-main) !important; /* Rosa Oro */
     text-align: center !important;
     border-bottom: 2px solid var(--color-border-soft) !important;
     margin-bottom: 10px !important;
-    text-shadow: 0 0 10px var(--color-accent-gold), 0 0 20px rgba(255, 199, 44, 0.5) !important;
+    /* Efecto de brillo Rose Gold */
+    text-shadow: 0 0 10px var(--color-accent-main), 0 0 20px rgba(255, 183, 197, 0.5) !important;
     animation: glow 2s ease-in-out infinite alternate !important;
 }
 @keyframes glow {
-    from { text-shadow: 0 0 5px var(--color-accent-gold); }
-    to { text-shadow: 0 0 15px var(--color-accent-gold), 0 0 20px var(--color-dark-surface); }
+    from { text-shadow: 0 0 5px var(--color-accent-main); }
+    to { text-shadow: 0 0 15px var(--color-accent-main), 0 0 20px var(--color-dark-surface); }
 }
 
 /* Subtítulos */
 .stMarkdown h2 {
     font-family: 'Playfair Display', serif !important;
     font-size: 28px !important;
-    color: var(--color-accent-gold) !important;
+    color: var(--color-light-accent) !important; /* Gris Perla */
     text-align: center !important;
     margin-bottom: 0px !important;
 }
@@ -54,14 +54,14 @@
     align-items: center;
     padding: 20px;
     margin: 0 auto;
-    background-color: transparent !important; /* FORZAR TRANSPARENCIA */
+    background-color: transparent !important; 
 }
 .imagen-banner {
     padding: 0;
     max-height: 200px; 
     width: auto;
     height: auto;
-    background-color: transparent !important; /* FORZAR TRANSPARENCIA */
+    background-color: transparent !important; 
 }
 
 /* --- BOTONES --- */
@@ -69,11 +69,11 @@ button.stButton > button,
 div.stButton > button,
 div[data-testid="stFormSubmitButton"] button,
 .custom-button {
-    /* Gradiente con tonos de púrpura/azul claro */
-    background: linear-gradient(135deg, var(--color-button-end) 0%, var(--color-button-base) 100%) !important;
-    color: var(--color-contrast-text) !important;
+    /* Gradiente suave de Rose Gold */
+    background: linear-gradient(135deg, var(--color-button-base) 0%, var(--color-button-end) 100%) !important;
+    color: var(--color-contrast-dark) !important; /* Texto negro sobre Rose Gold */
     font-weight: bold !important;
-    border: 1px solid var(--color-button-end) !important; /* Borde más sutil */
+    border: 1px solid var(--color-button-end) !important; 
     transition: all 0.3s !important;
     border-radius: 8px !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
@@ -84,13 +84,13 @@ div.stButton > button:hover,
 div[data-testid="stFormSubmitButton"] button:hover,
 .custom-button:hover {
     transform: scale(1.03) !important;
-    box-shadow: 0 6px 15px rgba(255, 199, 44, 0.4) !important; /* Sombra dorada suave */
+    box-shadow: 0 6px 15px rgba(255, 183, 197, 0.7) !important; /* Sombra Rose Gold intensa */
 }
 
 /* Botón Ir A JUGAR */
 .btn-jugar {
-    background: linear-gradient(135deg, var(--color-button-end) 0%, var(--color-button-base) 100%) !important;
-    color: var(--color-contrast-text) !important;
+    background: linear-gradient(135deg, var(--color-button-base) 0%, var(--color-button-end) 100%) !important;
+    color: var(--color-contrast-dark) !important;
     font-weight: bold !important;
     border: 1px solid var(--color-button-end) !important;
     padding: 5px !important;
@@ -102,18 +102,17 @@ div[data-testid="stFormSubmitButton"] button:hover,
     width: 30% !important;
 }
 
-
 /* --- INPUTS Y SELECCIONES --- */
 .stTextInput input, 
 .stNumberInput input,
 div.stSelectbox > div[data-baseweb="select"] {
     background: var(--color-dark-surface) !important; 
-    color: var(--color-accent-gold) !important;
+    color: var(--color-light-accent) !important; /* Texto Gris Perla */
     border: 1px solid var(--color-border-soft) !important;
 }
 .stTextInput > label,
 .stNumberInput > label {
-    color: #AAAAAA !important; /* Texto de la etiqueta */
+    color: var(--color-light-accent) !important; 
 }
 
 
@@ -124,15 +123,15 @@ div.stSelectbox > div[data-baseweb="select"] {
 }
 
 .stTabs [aria-selected="true"] {
-    color: var(--color-accent-gold) !important;
-    background: var(--color-background-main) !important;
-    border-top: 2px solid var(--color-accent-gold) !important;
+    color: var(--color-contrast-dark) !important; /* Texto negro */
+    background: var(--color-accent-main) !important; /* Pestaña activa en Rose Gold */
+    border-top: 2px solid var(--color-button-end) !important;
     border-left: 1px solid var(--color-border-soft) !important;
     border-right: 1px solid var(--color-border-soft) !important;
 }
 
 .stTabs [role="tab"] {
-    color: #AAAAAA !important; 
+    color: var(--color-light-accent) !important; /* Texto Gris Perla en pestañas inactivas */
     background: var(--color-dark-surface) !important;
 }
 
@@ -141,7 +140,7 @@ div.stSelectbox > div[data-baseweb="select"] {
 /* Sidebar */
 section[data-testid="stSidebar"] {
     background: var(--color-dark-surface) !important;
-    border-right: 3px solid var(--color-accent-gold) !important;
+    border-right: 3px solid var(--color-accent-main) !important; /* Borde Rose Gold */
 }
 
 /* Tablas */
@@ -159,7 +158,21 @@ section[data-testid="stSidebar"] {
     background-position: center;
 }
 
+/* Footer compacto */
+.footer-compacto a {
+    color: var(--color-accent-main) !important; /* Links en Rose Gold */
+    text-decoration: none !important;
+    font-weight: bold !important;
+}
+
 /* Eliminar espacios y gaps de Streamlit */
+div.stMarkdown:has(div.footer-compacto) {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+section[data-testid="stMain"] .block-container {
+    padding-bottom: 0 !important;
+}
 div.block-container {
     padding-top: 0 !important;
 }
