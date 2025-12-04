@@ -234,7 +234,7 @@ def store_page():
                             
                             # Botón "Agregar al Carrito"
                             # La clave debe ser única por tab si la necesitas, pero row['id'] es suficiente aquí.
-                            if st.button(f"Agregar al Carrito", key=f"btn_{row['id']}"): 
+                            if st.button(f"Agregar al Carrito", key=f"btn_{tab_name}_{row['id']}"):
                                 st.session_state.cart.append({"name": row['name'], "price": row['price']})
                                 st.toast(f"{row['name']} agregado al carrito!", icon="🛍️")
                                 st.rerun()
