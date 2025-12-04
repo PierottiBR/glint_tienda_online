@@ -90,35 +90,45 @@ def load_products_github():
 
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
-    # --- CSS PARA CENTRAR EL CONTENIDO ---
+    
+    # FUNCIONES LOCALES DENTRO DE store_page()
     def get_base64(image_path):
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode()
 
-    #image_base64 = get_base64("images/background.png")
+    # Obtén el base64 del logo (asumiendo que GlintAccesoriosLogo.png existe)
     banner_base64 = get_base64("GlintAccesoriosLogo.png")
     
-
     # Cargar CSS y reemplazar la variable dinámica
-    def load_css(file_name, image_base64):
+    def load_css(file_name): # ¡QUITAMOS image_base64 como argumento aquí!
         with open(file_name, "r") as f:
-            css_content = f.read().replace("{image_base64}", image_base64)
+            # Reemplazamos {image_base64} si es necesario para el BACKGROUND (que no está en este fragmento)
+            css_content = f.read() 
             st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
     def setup_casino_theme():
-        load_css("casino_theme.css")
+        # Aquí puedes pasar la URL del background si la tienes
+        load_css("casino_theme.css") 
 
     setup_casino_theme()
 
-    # Mostrar el banner con HTML para asegurar que el CSS se aplique
+    # --- CENTRADO Y VISUALIZACIÓN DEL LOGO ---
+    
+    # El CSS del banner ya tiene "justify-content: center" y "align-items: center".
+    # Usamos ese contenedor y el título de Streamlit.
     st.markdown(
         f"""
         <div class="contenedor">
-            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="banner">
+            <img src="data:image/png;base64,{banner_base64}" class="imagen-banner" alt="Glint Accesorios Logo">
         </div>
         """,
         unsafe_allow_html=True
     )
+    
+    # st.title utiliza la clase h1, que en tu CSS ya tiene text-align: center !important
+    st.title("💎 Tienda de Bijoutery & Accesorios")
+    
+    st.markdown("---")
     
     # 1. Cargar Productos desde GitHub
     products_df = load_products_github()
