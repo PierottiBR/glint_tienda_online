@@ -12,7 +12,7 @@ load_dotenv()
 
 
 # --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
-st.set_page_config(page_title="Bijoutery Glam", layout="wide", page_icon="💎")
+st.set_page_config(page_title="Glint Accesorios", layout="wide", page_icon="💎")
 
 hide_streamlit_style = """
 <style>
@@ -90,7 +90,8 @@ def load_products_github():
 
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
-    st.title("💎 Tienda de Bijoutery & Accesorios")
+    st.image('GlintAccesoriosLogo.png', use_column_width=True)
+    st.title("💎 Glint Accesorios")
     
     # 1. Cargar Productos desde GitHub
     products_df = load_products_github()
