@@ -10,18 +10,24 @@ from io import StringIO
 from dotenv import load_dotenv
 load_dotenv()
 
-# --- CÓDIGO PARA OCULTAR EL SIDEBAR Y EL MAIN MENU ---
+# --- CÓDIGO PARA CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Glint Accesorios", layout="wide", page_icon="💎")
 
+# --- CORRECCIÓN AQUÍ: CSS ---
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
-div[data-testid="stSidebar"] {
-    visibility: hidden;
+
+/* CORRECCIÓN: 
+   Cambiamos 'stSidebar' (que oculta todo) por 'stSidebarNav' (que oculta solo el menú de navegación).
+   Esto permite que el sidebar se muestre para el Carrito, pero oculta los links a otras páginas.
+*/
+div[data-testid="stSidebarNav"] {
     display: none;
 }
+
 /* Ajuste para evitar parpadeos en tabs */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
@@ -47,7 +53,7 @@ PRODUCTS_PATH = f"files_csv/{PRODUCTS_FILE}"
 
 # --- FUNCIONES DE LECTURA DE CSV EN GITHUB ---
 
-@st.cache_data(ttl=600) # Aumenté el caché a 10 min para mejorar rendimiento entre clicks
+@st.cache_data(ttl=600)
 def load_products_github():
     default_columns = ['id', 'name', 'category', 'price', 'stock', 'image_path', 'description']
     default_df = pd.DataFrame(columns=default_columns)
@@ -71,21 +77,18 @@ def load_products_github():
         return df
         
     except Exception as e:
-        # En producción podrías querer ocultar el error detallado
         st.error(f"Error cargando productos: {str(e)}")
         return default_df
 
 # --- INTERFAZ: TIENDA (CLIENTE) ---
 def store_page():
     
-    # 1. FUNCIÓN CALLBACK PARA EL CARRITO (LA SOLUCIÓN AL REFRESH)
-    # Esta función se ejecuta ANTES de que la página se redibuje.
+    # Callback para agregar al carrito sin recargar
     def add_to_cart_callback(product_name, product_price):
         st.session_state.cart.append({"name": product_name, "price": product_price})
         st.toast(f"{product_name} agregado al carrito!", icon="🛍️")
 
     def get_base64(image_path):
-        # Manejo de error si no existe la imagen local
         if not os.path.exists(image_path):
             return ""
         with open(image_path, "rb") as image_file:
@@ -101,7 +104,6 @@ def store_page():
                 css_content = f.read() 
                 st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
-    # Cargar tema (asegúrate que el archivo exista)
     load_css("casino_theme.css") 
 
     # --- BANNER ---
@@ -119,14 +121,12 @@ def store_page():
 
     st.markdown("---")
     
-    # Cargar datos
     products_df = load_products_github()
     
-    # Inicializar carrito
     if 'cart' not in st.session_state:
         st.session_state.cart = []
 
-    # Sidebar - Carrito
+    # --- SIDEBAR (Ahora debería ser visible) ---
     with st.sidebar:
         st.header("🛒 Tu Carrito")
         if len(st.session_state.cart) > 0:
@@ -152,7 +152,6 @@ def store_page():
             whatsapp_url = f"https://wa.me/{phone_number}?text={message}"
             st.link_button("📲 Enviar Pedido por WhatsApp", whatsapp_url)
             
-            # Usamos callback aquí también para vaciar sin rerun brusco (opcional, pero recomendado)
             def clear_cart():
                 st.session_state.cart = []
             
@@ -160,10 +159,7 @@ def store_page():
         else:
             st.info("El carrito está vacío.")
 
-    # ============================================================
-    # 2. PROCESAMIENTO DE CATEGORÍAS (Una sola vez antes del loop)
-    # ============================================================
-    
+    # --- FILTROS Y CATEGORÍAS ---
     available_products = products_df[products_df['stock'] > 0].copy()
 
     def split_category(val):
@@ -183,31 +179,21 @@ def store_page():
     main_categories = sorted(available_products['main_cat'].dropna().unique().tolist())
     tab_names = ["Todas"] + main_categories 
 
-    # Crear Tabs
     product_tabs = st.tabs(tab_names)
 
-    # Iterar Tabs
     for i, tab_name in enumerate(tab_names):
-        
         with product_tabs[i]:
-            
-            # Filtrado Nivel 1
             if tab_name == "Todas":
                 current_filtered_products = available_products
             else:
                 current_filtered_products = available_products[available_products['main_cat'] == tab_name]
             
-            # Filtrado Nivel 2 (Subcategorías)
             unique_subcats = current_filtered_products['sub_cat'].dropna().unique().tolist()
             
-            # IMPORTANTE: El st.radio causa rerun por diseño de Streamlit.
-            # No podemos evitar el rerun al filtrar, pero podemos hacerlo eficiente.
             if tab_name != "Todas" and len(unique_subcats) > 0:
                 sub_options = ["Ver todo"] + sorted(unique_subcats)
-                
                 st.write("📂 **Filtrar por tipo:**")
                 
-                # Usamos una key única basada en el tab para mantener el estado
                 selected_sub = st.radio(
                     label="Selecciona tipo",
                     options=sub_options,
@@ -221,19 +207,15 @@ def store_page():
             
             st.divider()
             
-            # Grid de Productos
             if not current_filtered_products.empty:
-                # Ordenar por ID
                 current_filtered_products = current_filtered_products.sort_values(by='id', ascending=True)
 
                 cols = st.columns(3) 
                 col_index = 0
                 
                 for index, row in current_filtered_products.iterrows():
-                    
                     with cols[col_index % 3]: 
                         with st.container(border=True):
-                            
                             relative_path = row['image_path']
                             raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/{relative_path}"
                             
@@ -251,20 +233,15 @@ def store_page():
                             st.write(f"**Precio: ${row['price']:,.0f}**")
                             st.write(f"Stock: {row['stock']} un.")
                             
-                            # --- CORRECCIÓN CLAVE AQUÍ ---
-                            # Usamos on_click y args. Quitamos el 'if' y el 'st.rerun()'
                             st.button(
                                 "Agregar al Carrito", 
                                 key=f"btn_{tab_name}_{row['id']}",
-                                on_click=add_to_cart_callback, # Llamada a la función arriba
-                                args=(row['name'], row['price']) # Argumentos para la función
+                                on_click=add_to_cart_callback,
+                                args=(row['name'], row['price'])
                             )
-                            # -----------------------------
-
                     col_index += 1
             else:
                 st.info("No hay productos disponibles en esta sección.")
 
-# --- MAIN APP ---
 if __name__ == "__main__":
     store_page()
