@@ -1,10 +1,12 @@
+/* casino_theme.css */
+
 /* Fuentes Google */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap');
 
 /* === VARIABLES DE COLOR === */
 :root {
     --color-background-main: #1A1A1A;    /* Negro Obsidiana */
-    --color-accent-main: #FFB7C5;        /* Rosa Oro (Rose Gold) - Color principal de acento */
+    --color-accent-main: #FFB7C5;        /* Rosa Oro (Rose Gold) */
     --color-light-accent: #E8E8E8;       /* Gris Perla Suave */
     --color-dark-surface: #2C2C2C;       /* Gris Oscuro para Tablas/Inputs */
     --color-button-base: #FFB7C5;        /* Rosa Oro para botones */
@@ -14,10 +16,23 @@
     --color-contrast-dark: #000000;      /* Negro */
 }
 
-/* Títulos */
+/* =========================================
+   CONFIGURACIÓN GENERAL Y BACKGROUND
+   ========================================= */
+[data-testid="stAppViewContainer"] {
+    background-color: var(--color-background-main);
+    /* Si deseas una imagen de fondo fija, pon la URL aquí. 
+       La versión dinámica {image_base64} requiere procesamiento extra en Python. */
+    /* background-image: url("ruta/a/tu/imagen.jpg"); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Títulos (H1) */
 .stMarkdown h1 {
     font-family: 'Playfair Display', serif !important;
-    color: var(--color-accent-main) !important; /* Rosa Oro */
+    color: var(--color-accent-main) !important;
     text-align: center !important;
     border-bottom: 2px solid var(--color-border-soft) !important;
     margin-bottom: 10px !important;
@@ -25,16 +40,17 @@
     text-shadow: 0 0 10px var(--color-accent-main), 0 0 20px rgba(255, 183, 197, 0.5) !important;
     animation: glow 2s ease-in-out infinite alternate !important;
 }
+
 @keyframes glow {
     from { text-shadow: 0 0 5px var(--color-accent-main); }
     to { text-shadow: 0 0 15px var(--color-accent-main), 0 0 20px var(--color-dark-surface); }
 }
 
-/* Subtítulos */
+/* Subtítulos (H2, H3) */
 .stMarkdown h2 {
     font-family: 'Playfair Display', serif !important;
     font-size: 28px !important;
-    color: var(--color-light-accent) !important; /* Gris Perla */
+    color: var(--color-light-accent) !important;
     text-align: center !important;
     margin-bottom: 0px !important;
 }
@@ -47,7 +63,9 @@
     margin-bottom: 0px !important;
 }
 
-/* --- LOGO Y BANNER (Corregido para Transparencia) --- */
+/* =========================================
+   LOGO Y BANNER
+   ========================================= */
 .contenedor {
     display: flex;
     justify-content: center;
@@ -64,14 +82,15 @@
     background-color: transparent !important; 
 }
 
-/* --- BOTONES --- */
+/* =========================================
+   BOTONES
+   ========================================= */
 button.stButton > button,
 div.stButton > button,
-div[data-testid="stFormSubmitButton"] button,
-.custom-button {
+div[data-testid="stFormSubmitButton"] button {
     /* Gradiente suave de Rose Gold */
     background: linear-gradient(135deg, var(--color-button-base) 0%, var(--color-button-end) 100%) !important;
-    color: var(--color-contrast-dark) !important; /* Texto negro sobre Rose Gold */
+    color: var(--color-contrast-dark) !important;
     font-weight: bold !important;
     border: 1px solid var(--color-button-end) !important; 
     transition: all 0.3s !important;
@@ -81,98 +100,80 @@ div[data-testid="stFormSubmitButton"] button,
 
 button.stButton > button:hover,
 div.stButton > button:hover,
-div[data-testid="stFormSubmitButton"] button:hover,
-.custom-button:hover {
+div[data-testid="stFormSubmitButton"] button:hover {
     transform: scale(1.03) !important;
     box-shadow: 0 6px 15px rgba(255, 183, 197, 0.7) !important; /* Sombra Rose Gold intensa */
 }
 
-/* Botón Ir A JUGAR */
-.btn-jugar {
-    background: linear-gradient(135deg, var(--color-button-base) 0%, var(--color-button-end) 100%) !important;
-    color: var(--color-contrast-dark) !important;
-    font-weight: bold !important;
-    border: 1px solid var(--color-button-end) !important;
-    padding: 5px !important;
-    font-size: 16px !important;
-    border-radius: 4px !important;
-    text-align: center !important;
-    display: inline-block !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
-    width: 30% !important;
-}
-
-/* --- INPUTS Y SELECCIONES --- */
+/* =========================================
+   INPUTS Y SELECCIONES
+   ========================================= */
 .stTextInput input, 
 .stNumberInput input,
 div.stSelectbox > div[data-baseweb="select"] {
     background: var(--color-dark-surface) !important; 
-    color: var(--color-light-accent) !important; /* Texto Gris Perla */
+    color: var(--color-light-accent) !important;
     border: 1px solid var(--color-border-soft) !important;
 }
 .stTextInput > label,
 .stNumberInput > label {
     color: var(--color-light-accent) !important; 
 }
+/* Color del texto seleccionado en un dropdown */
+div[data-baseweb="select"] span {
+    color: var(--color-light-accent) !important;
+}
 
-
-/* --- TABS --- */
+/* =========================================
+   TABS (Pestañas)
+   ========================================= */
 .stTabs [role="tablist"] {
     background: var(--color-dark-surface) !important;
     border-bottom: 2px solid var(--color-border-soft) !important;
+    border-radius: 10px 10px 0 0;
 }
 
 .stTabs [aria-selected="true"] {
-    color: var(--color-contrast-dark) !important; /* Texto negro */
-    background: var(--color-accent-main) !important; /* Pestaña activa en Rose Gold */
-    border-top: 2px solid var(--color-button-end) !important;
-    border-left: 1px solid var(--color-border-soft) !important;
-    border-right: 1px solid var(--color-border-soft) !important;
+    color: var(--color-contrast-dark) !important;
+    background: var(--color-accent-main) !important;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
 }
 
 .stTabs [role="tab"] {
-    color: var(--color-light-accent) !important; /* Texto Gris Perla en pestañas inactivas */
-    background: var(--color-dark-surface) !important;
+    color: var(--color-light-accent) !important;
+    background: transparent !important;
 }
 
-/* --- OTROS ELEMENTOS DE ESTILO --- */
-
-/* Tablas */
+/* =========================================
+   TABLAS (Dataframes)
+   ========================================= */
 .stDataFrame {
     background: var(--color-dark-surface) !important;
     color: var(--color-contrast-text) !important; 
 }
-
-/* BACKGROUND Principal */
-[data-testid="stAppViewContainer"] {
-    background-color: var(--color-background-main); /* Establecer el color principal */
-    background-image: url("data:image/png;base64,{image_base64}");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+div[data-testid="stDataFrame"] {
+    background-color: var(--color-dark-surface);
 }
 
-/* Footer compacto */
-.footer-compacto a {
-    color: var(--color-accent-main) !important; /* Links en Rose Gold */
-    text-decoration: none !important;
-    font-weight: bold !important;
-}
+/* =========================================
+   SIDEBAR Y HEADER (LA CORRECCIÓN IMPORTANTE)
+   ========================================= */
 
-/* Eliminar espacios y gaps de Streamlit */
-div.stMarkdown:has(div.footer-compacto) {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-section[data-testid="stMain"] .block-container {
-    padding-bottom: 0 !important;
-}
-div.block-container {
-    padding-top: 0 !important;
-}
+/* 1. Hacer el header transparente en lugar de ocultarlo (Para ver la flecha >) */
 header[data-testid="stHeader"] {
-    display: none !important;
+    background-color: rgba(0,0,0,0) !important;
+    z-index: 1;
+}
+
+/* 2. Ocultar menú hamburguesa y footer */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+
+/* 3. Ajustes de espaciado para eliminar huecos blancos */
+div.block-container {
+    padding-top: 2rem !important; /* Un poco de espacio arriba */
 }
 div[data-testid="stVerticalBlock"] {
-    gap: 0 !important;
+    gap: 1rem !important;
 }
