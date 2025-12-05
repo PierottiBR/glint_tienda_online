@@ -11,6 +11,8 @@ import json
 from dotenv import load_dotenv
 from hashlib import sha256
 import time
+import re
+
 # Cargar variables de entorno
 load_dotenv()
 
@@ -41,6 +43,7 @@ PRODUCTS_FILE = "products.csv"
 PRODUCTS_PATH = f"files_csv/{PRODUCTS_FILE}"
 CATEGORIES_FILE = "categories.json" # <--- AGREGAR ESTA VARIABLE
 CATEGORIES_PATH = f"files_csv/{CATEGORIES_FILE}"
+CSS_FILE = "casino_theme.css"
 # Validación de credenciales
 if not GITHUB_TOKEN or not GITHUB_REPO:
     st.error("Error: Las credenciales de GitHub (GITHUB_TOKEN y GITHUB_REPO) no se han cargado correctamente.")
@@ -77,6 +80,79 @@ def check_credentials(username, password):
             valid_credentials[username] == hash_password(password))
 
 # --- FUNCIONES DE GITHUB ---
+
+# --- FUNCIONES PARA GESTIÓN DE TEMA (CSS) ---
+
+def load_css_github():
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{CSS_FILE}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=TIMEOUT_API)
+        response.raise_for_status()
+        
+        file_info = response.json()
+        content_encoded = file_info["content"].replace('\n', '')
+        content_decoded = base64.b64decode(content_encoded).decode('utf-8')
+        
+        st.session_state['css_sha'] = file_info.get("sha")
+        return content_decoded
+    except Exception as e:
+        st.error(f"Error cargando CSS: {e}")
+        return None
+
+def save_css_github(css_content, commit_message="Actualización de diseño"):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{CSS_FILE}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    try:
+        sha = st.session_state.get('css_sha')
+        encoded_content = base64.b64encode(css_content.encode('utf-8')).decode()
+
+        data = {
+            "message": commit_message,
+            "content": encoded_content,
+            "branch": GITHUB_BRANCH,
+        }
+        if sha:
+            data["sha"] = sha
+
+        response = requests.put(url, headers=headers, json=data, timeout=TIMEOUT_API)
+        response.raise_for_status()
+        
+        # Actualizar SHA
+        st.session_state['css_sha'] = response.json().get("content", {}).get("sha")
+        return True
+    except Exception as e:
+        st.error(f"Error guardando CSS: {e}")
+        return False
+
+def extract_colors_from_css(css_content):
+    # Diccionario para mapear nombres de variables a descripciones amigables
+    variable_map = {
+        "--color-background-main": "Fondo Principal",
+        "--color-accent-main": "Color Principal (Títulos/Brillo)",
+        "--color-light-accent": "Texto Secundario / Bordes Claros",
+        "--color-dark-surface": "Fondo de Tablas e Inputs",
+        "--color-button-base": "Botón (Color Inicial)",
+        "--color-button-end": "Botón (Color Final - Gradiente)",
+        "--color-border-soft": "Bordes Suaves",
+        "--color-contrast-text": "Texto en Tablas (Blanco)",
+        "--color-contrast-dark": "Texto en Botones (Negro)"
+    }
+    
+    found_colors = {}
+    
+    # Buscamos patrones: --nombre-variable: #HEXCODE;
+    for var, label in variable_map.items():
+        pattern = f"{var}:\s*(#[0-9a-fA-F]{{6}});"
+        match = re.search(pattern, css_content)
+        if match:
+            found_colors[var] = {
+                "label": label,
+                "value": match.group(1)
+            }
+    return found_colors
 
 # --- FUNCIONES PARA CATEGORÍAS (JSON) ---
 def load_categories_github():
@@ -293,7 +369,7 @@ def main():
         # Cargar DF de sesión
         df = st.session_state['products_df'].copy()
             
-        tab1, tab2 = st.tabs(["➕ Agregar Producto", "📝 Editar/Eliminar Inventario"])
+        tab1, tab2, tab3 = st.tabs(["➕ Agregar Producto", "📝 Inventario", "🎨 Personalizar Diseño"])
 
         # --- Pestaña 1: Agregar Producto ---
         with tab1:
@@ -469,6 +545,61 @@ def main():
                         st.warning("Selecciona un producto.")
             else:
                 st.info("No hay productos cargados en el inventario.")
+        # --- Pestaña 3: Personalizar Diseño ---
+    with tab3:
+        st.subheader("🎨 Estética de la Tienda")
+        st.info("Aquí puedes cambiar los colores de la tienda. Los cambios se aplicarán al guardar.")
 
+        # 1. Cargar CSS actual
+        css_content = load_css_github()
+
+        if css_content:
+            # 2. Extraer colores actuales
+            current_colors = extract_colors_from_css(css_content)
+            
+            # 3. Formulario de edición
+            with st.form("theme_form"):
+                st.write("### Paleta de Colores")
+                
+                col1, col2 = st.columns(2)
+                new_values = {}
+                
+                # Iteramos sobre los colores encontrados para crear los pickers
+                for i, (var_name, data) in enumerate(current_colors.items()):
+                    # Distribuir en 2 columnas
+                    with (col1 if i % 2 == 0 else col2):
+                        new_values[var_name] = st.color_picker(
+                            label=data["label"],
+                            value=data["value"],
+                            key=f"cp_{var_name}"
+                        )
+                
+                st.write("---")
+                submitted = st.form_submit_button("💾 Guardar Nuevo Diseño")
+                
+                if submitted:
+                    # 4. Reemplazar colores en el texto CSS
+                    updated_css = css_content
+                    changes_made = False
+                    
+                    for var_name, new_hex in new_values.items():
+                        old_hex = current_colors[var_name]["value"]
+                        if new_hex != old_hex:
+                            # Reemplazo seguro usando Regex para esa línea específica
+                            pattern = f"({var_name}:\s*)#[0-9a-fA-F]{{6}}(;)"
+                            replacement = f"\\g<1>{new_hex}\\g<2>"
+                            updated_css = re.sub(pattern, replacement, updated_css)
+                            changes_made = True
+                    
+                    if changes_made:
+                        if save_css_github(updated_css, "Admin: Cambio de colores"):
+                            st.success("¡Diseño actualizado! Los cambios pueden tardar unos minutos en reflejarse en la tienda.")
+                            st.balloons()
+                            time.sleep(2)
+                            st.rerun()
+                    else:
+                        st.info("No cambiaste ningún color.")
+        else:
+            st.error("No se pudo cargar el archivo de estilos CSS desde GitHub.")
 if __name__ == "__main__":
     main()
