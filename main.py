@@ -14,7 +14,31 @@ load_dotenv()
 st.set_page_config(page_title="Glint Accesorios", layout="wide", page_icon="💎")
 
 # --- CORRECCIÓN AQUÍ: CSS ---
+hide_streamlit_style = """
+<style>
+/* 1. Ocultar el menú de hamburguesa (los tres puntos arriba a la derecha) */
+#MainMenu {visibility: hidden;}
 
+/* 2. Ocultar el pie de página "Made with Streamlit" */
+footer {visibility: hidden;}
+
+/* 3. Ocultar la barra superior (Header), PERO dejarla accesible para el botón del sidebar */
+header[data-testid="stHeader"] {
+    background-color: rgba(0,0,0,0); /* Transparente */
+}
+
+/* 4. ESTA ES LA CLAVE: Ocultar SOLO la navegación de páginas (Main, Admin) */
+div[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* 5. Asegurar que el botón para abrir/cerrar el sidebar (> o <) sea visible */
+button[kind="header"] {
+    visibility: visible !important;
+}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # -----------------------------------------------------
 
 # --- CONFIGURACIÓN DE RUTAS Y API ---
