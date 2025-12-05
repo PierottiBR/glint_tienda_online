@@ -14,27 +14,7 @@ load_dotenv()
 st.set_page_config(page_title="Glint Accesorios", layout="wide", page_icon="💎")
 
 # --- CORRECCIÓN AQUÍ: CSS ---
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
 
-/* CORRECCIÓN: 
-   Cambiamos 'stSidebar' (que oculta todo) por 'stSidebarNav' (que oculta solo el menú de navegación).
-   Esto permite que el sidebar se muestre para el Carrito, pero oculta los links a otras páginas.
-*/
-div[data-testid="stSidebarNav"] {
-    display: none;
-}
-
-/* Ajuste para evitar parpadeos en tabs */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 10px;
-}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # -----------------------------------------------------
 
 # --- CONFIGURACIÓN DE RUTAS Y API ---
