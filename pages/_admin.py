@@ -10,7 +10,7 @@ from io import StringIO
 import json
 from dotenv import load_dotenv
 from hashlib import sha256
-
+import time
 # Cargar variables de entorno
 load_dotenv()
 
@@ -39,7 +39,8 @@ TIMEOUT_API = 10
 IMG_FOLDER = "img"
 PRODUCTS_FILE = "products.csv"
 PRODUCTS_PATH = f"files_csv/{PRODUCTS_FILE}"
-
+CATEGORIES_FILE = "categories.json" # <--- AGREGAR ESTA VARIABLE
+CATEGORIES_PATH = f"files_csv/{CATEGORIES_FILE}"
 # Validación de credenciales
 if not GITHUB_TOKEN or not GITHUB_REPO:
     st.error("Error: Las credenciales de GitHub (GITHUB_TOKEN y GITHUB_REPO) no se han cargado correctamente.")
@@ -56,6 +57,9 @@ def init_session_state():
         st.session_state.authenticated = False
     if 'products_df' not in st.session_state:
         st.session_state['products_df'] = load_products_github()
+    # --- NUEVO: CARGAR CATEGORÍAS ---
+    if 'categories_data' not in st.session_state:
+        st.session_state['categories_data'] = load_categories_github()
     if 'username' not in st.session_state:
         st.session_state.username = ""
     if 'attempts' not in st.session_state:
@@ -73,6 +77,68 @@ def check_credentials(username, password):
             valid_credentials[username] == hash_password(password))
 
 # --- FUNCIONES DE GITHUB ---
+
+# --- FUNCIONES PARA CATEGORÍAS (JSON) ---
+def load_categories_github():
+    # Estructura por defecto si no existe el archivo aún
+    default_categories = {
+        "Acero Blanco": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+        "Acero Dorado": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
+        "Acero Quirúrgico": ["Aros", "Pulseras", "Collares", "Dijes"],
+        "Plata": ["Aros"],
+        "Pañuelos": [],
+        "Complementos": []
+    }
+    
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{CATEGORIES_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=TIMEOUT_API)
+        response.raise_for_status()
+        
+        file_info = response.json()
+        content_encoded = file_info["content"].replace('\n', '')
+        content_decoded = base64.b64decode(content_encoded).decode('utf-8')
+        
+        st.session_state['categories_sha'] = file_info.get("sha")
+        return json.loads(content_decoded) # Convertimos texto a Diccionario Python
+        
+    except Exception:
+        # Si falla (404 no existe), devolvemos el default y el SHA nulo
+        st.session_state['categories_sha'] = None
+        return default_categories
+
+def save_categories_github(categories_dict, commit_message="Actualización de Categorías"):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{CATEGORIES_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    try:
+        sha = st.session_state.get('categories_sha')
+        # Convertir diccionario a JSON texto
+        json_content = json.dumps(categories_dict, indent=4, ensure_ascii=False)
+        encoded_content = base64.b64encode(json_content.encode('utf-8')).decode()
+
+        data = {
+            "message": commit_message,
+            "content": encoded_content,
+            "branch": GITHUB_BRANCH,
+        }
+        if sha:
+            data["sha"] = sha
+
+        response = requests.put(url, headers=headers, json=data, timeout=TIMEOUT_API)
+        response.raise_for_status()
+        
+        # Actualizar SHA
+        response_json = response.json()
+        st.session_state['categories_sha'] = response_json.get("content", {}).get("sha")
+        return True
+    except Exception as e:
+        st.error(f"Error guardando categorías: {e}")
+        return False
+    
+    
 def load_products_github():
     default_columns = ['id', 'name', 'category', 'price', 'stock', 'image_path', 'description']
     default_df = pd.DataFrame(columns=default_columns)
@@ -232,16 +298,56 @@ def main():
         # --- Pestaña 1: Agregar Producto ---
         with tab1:
             st.subheader("Nuevo Producto")
-            
-            # Estructura de categorías
-            CATEGORIAS_ESTRUCTURA = {
-                "Acero Blanco": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
-                "Acero Dorado": ["Aros", "Pulseras", "Collares", "Dijes", "Anillos"],
-                "Acero Quirúrgico": ["Aros", "Pulseras", "Collares", "Dijes"],
-                "Plata": ["Aros"],
-                "Pañuelos": [],
-                "Complementos": []
-            }
+            # ---------------------------------------------------------
+            # SECCIÓN 1: GESTOR DE CATEGORÍAS (NUEVO)
+            # ---------------------------------------------------------
+            with st.expander("📂 ¿Necesitas una categoría nueva? Créala aquí"):
+                st.write("Agrega una nueva línea (ej: Oro) o un nuevo tipo (ej: Tobillera en Acero Blanco).")
+                c_cat1, c_cat2, c_cat3 = st.columns([2, 2, 1])
+                
+                # Obtener diccionario actual
+                current_cats = st.session_state['categories_data']
+                
+                with c_cat1:
+                    # Opción para crear nueva Categoría Principal o seleccionar existente
+                    opcion_creacion = st.radio("¿Qué quieres agregar?", ["Nuevo Tipo en categoría existente", "Nueva Línea/Material completa"])
+                
+                with c_cat2:
+                    if opcion_creacion == "Nueva Línea/Material completa":
+                        new_main_cat = st.text_input("Nombre de la nueva Línea (ej: Oro 18k)")
+                        new_sub_cat_optional = st.text_input("Primer tipo (Opcional, ej: Anillos)")
+                    else:
+                        # Seleccionar existente
+                        cat_parent = st.selectbox("Selecciona la Línea existente", list(current_cats.keys()))
+                        new_sub_type = st.text_input("Nombre del nuevo tipo (ej: Tobilleras)")
+
+                with c_cat3:
+                    st.write("") # Espacio vertical
+                    st.write("")
+                    if st.button("➕ Crear Categoría"):
+                        updated = False
+                        if opcion_creacion == "Nueva Línea/Material completa":
+                            if new_main_cat and new_main_cat not in current_cats:
+                                # Crear nueva lista
+                                current_cats[new_main_cat] = [new_sub_cat_optional] if new_sub_cat_optional else []
+                                updated = True
+                            elif new_main_cat in current_cats:
+                                st.warning("Esa categoría ya existe.")
+                        else:
+                            if new_sub_type and new_sub_type not in current_cats[cat_parent]:
+                                current_cats[cat_parent].append(new_sub_type)
+                                updated = True
+                            elif new_sub_type in current_cats[cat_parent]:
+                                st.warning("Ese tipo ya existe en esta categoría.")
+
+                        if updated:
+                            if save_categories_github(current_cats, "Nueva categoría añadida"):
+                                st.session_state['categories_data'] = current_cats
+                                st.success("Categoría actualizada!")
+                                time.sleep(1)
+                                st.rerun()
+
+            st.divider()
 
             with st.form("add_product_form", clear_on_submit=True):
                 col1, col2 = st.columns(2)
@@ -249,15 +355,23 @@ def main():
                 with col1:
                     name = st.text_input("Nombre del producto")
                     
-                    # Selectores de categoría anidados
-                    main_category = st.selectbox("Material / Línea", options=list(CATEGORIAS_ESTRUCTURA.keys()))
-                    sub_options = CATEGORIAS_ESTRUCTURA[main_category]
+                    # --- USAMOS LOS DATOS DINÁMICOS AQUÍ ---
+                    cats_data = st.session_state['categories_data']
+                    main_keys = list(cats_data.keys())
+                    
+                    main_category = st.selectbox("Material / Línea", options=main_keys)
+                    
+                    # Obtener subtipos según selección
+                    sub_options = cats_data.get(main_category, [])
                     
                     if sub_options:
                         sub_category = st.selectbox("Tipo de producto", options=sub_options)
                         category_final = f"{main_category} - {sub_category}"
                     else:
+                        # Caso: Categoría sin hijos (ej: Pañuelos)
+                        st.write(f"Categoría: {main_category}") 
                         category_final = main_category
+                    # ---------------------------------------
 
                     price = st.number_input("Precio ($)", min_value=0.0, step=100.0)
                     
@@ -273,12 +387,10 @@ def main():
                         
                         # Subir imagen
                         img_path = handle_image_upload(image, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, IMG_FOLDER)
-                        
                         if img_path is False:
                             st.warning(f"Error al subir la imagen. Intenta de nuevo.")
                             st.stop()
                         
-                        # Calcular ID
                         next_id = df['id'].max() + 1 if not df.empty and pd.notna(df['id'].max()) else 1
                         
                         new_product = pd.DataFrame([{
@@ -293,17 +405,11 @@ def main():
                         
                         updated_df = pd.concat([df, new_product], ignore_index=True)
                         
-                        # Guardar CSV
                         github_response = save_products_github(updated_df, f"Añadido producto: {name} ({category_final})")
                         
                         if github_response:
-                            commit_sha = github_response.get("commit", {}).get("sha", "N/A")
-                            commit_url = github_response.get("commit", {}).get("html_url", "#")
-                            
                             st.session_state['products_df'] = updated_df 
-                            
                             st.success(f"🎉 **Producto '{name}' agregado con éxito!**")
-                            st.markdown(f"[Ver Commit en GitHub]({commit_url}) (SHA: `{commit_sha[:7]}`)")
                             st.rerun()
                         else:
                             st.error("El producto no pudo guardarse en el CSV de GitHub.")
