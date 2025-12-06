@@ -14,6 +14,6 @@ id,name,category,price,stock,image_path,description
 13,PANDORA ATRAPASUEÑOS ,Acero Blanco - Pulseras,9500.0,1,img/IMG_9547.jpeg,Pulsera acero blanco con dijes.
 14,MARIPOSA CRISTAL ,Acero Blanco - Anillos,5500.0,2,img/IMG_0164.jpeg,"Anillo acero blanco, mariposa cristal."
 15,PERLA CHIC,Acero Dorado - Aros,4000.0,5,img/IMG_7492.jpeg,"Aros pasantes, acero dorado perlas. "
-16,PAÑUELO SEDA I,Pañuelos,4500.0,1,img/IMG_9358.jpeg,"Pañuelo de seda, 50 x 50 cm"
-17,PAÑUELO SEDA II,Pañuelos,4500.0,1,img/IMG_9333.jpeg,"Pañuelo de seda, 50 x 50 cm"
-18,PAÑUELO SEDA III,Pañuelos,4500.0,1,img/IMG_9407.jpeg,"Pañuelo de seda, 50 x 50 cm"
+16,PAÑUELO SEDA ,Pañuelos,4500.0,1,img/IMG_9358.jpeg,"Pañuelo de seda, 50 x 50 cm"
+17,PAÑUELO SEDA ,Pañuelos,4500.0,1,img/IMG_9333.jpeg,"Pañuelo de seda, 50 x 50 cm"
+18,PAÑUELO SEDA ,Pañuelos,4500.0,1,img/IMG_9407.jpeg,"Pañuelo de seda, 50 x 50 cm"
