@@ -16,3 +16,4 @@ id,name,category,price,stock,image_path,description
 15,PERLA CHIC,Acero Dorado - Aros,4000.0,5,img/IMG_7492.jpeg,"Aros pasantes, acero dorado perlas. "
 16,PAÑUELO SEDA I,Pañuelos,4500.0,1,img/IMG_9358.jpeg,"Pañuelo de seda, 50 x 50 cm"
 17,PAÑUELO SEDA II,Pañuelos,4500.0,1,img/IMG_9333.jpeg,"Pañuelo de seda, 50 x 50 cm"
+18,PAÑUELO SEDA III,Pañuelos,4500.0,1,img/IMG_9407.jpeg,"Pañuelo de seda, 50 x 50 cm"
