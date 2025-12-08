@@ -20,3 +20,4 @@ id,name,category,price,stock,image_path,description
 19,PAÑUELO SEDA ,Pañuelos,4500.0,1,img/IMG_9396.jpeg,"Pañuelo de seda, 50 x 50 cm"
 20,PAÑUELO SEDA,Pañuelos,4500.0,1,img/IMG_9435.jpeg,"Pañuelo de seda, 50 x 50 cm"
 21,AROS PLATA STRASS,Acero Blanco - Aros,10500.0,1,img/IMG_0154.jpeg,Aros acero blanco con strass. 
+22,GOTAS STRASS,Acero Dorado - Aros,4500.0,1,img/IMG_0140.jpeg,"Aros acero dorado, con strass."
