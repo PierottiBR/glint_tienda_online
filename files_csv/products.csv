@@ -24,3 +24,4 @@ id,name,category,price,stock,image_path,description
 23,SÚPER STRASS,Acero Dorado - Aros,9500.0,1,img/IMG_0144.jpeg,"Aros acero dorado, súper strass colores."
 24,PERLAS STRAS MINI,Acero Blanco - Aros,11000.0,1,img/IMG_0148.jpeg,"Aros acero blanco, con perlas y strass. "
 25,CRISTAL ,Acero Dorado - Aros,9500.0,1,img/IMG_0133.jpeg,"Aros pasantes, acero dorado con cristal. "
+26,STRASS PASANTE ,Acero Dorado - Aros,7000.0,1,img/IMG_0129.jpeg,"Aros acero dorado, strass pasantes.  "
