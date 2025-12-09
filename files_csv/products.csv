@@ -31,3 +31,4 @@ id,name,category,price,stock,image_path,description
 30,PLUMAS STRASS COLOR,Acero Blanco - Aros,5000.0,1,img/IMG_0117.jpeg,"Acero blanco, plumas strass. "
 31,ARGOLLA CORAZÓN STRASS,Acero Dorado - Aros,8000.0,1,img/IMG_0114.jpeg,"Argolla acero dorado, corazón strass."
 32,ARGOLLA FLECHA ,Acero Dorado - Aros,4500.0,1,img/IMG_0102.jpeg,"Argollas acero dorado, flecha con strass."
+33,STRASS CUBO ,Acero Blanco - Aros,8500.0,1,img/IMG_0159.jpeg,"Acero blanco, strass color. "
