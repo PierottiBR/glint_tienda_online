@@ -27,3 +27,4 @@ id,name,category,price,stock,image_path,description
 26,STRASS PASANTE ,Acero Dorado - Aros,7000.0,1,img/IMG_0129.jpeg,"Aros acero dorado, strass pasantes.  "
 27,ARGOLLA FLOR ,Acero Blanco - Aros,6000.0,1,img/IMG_0124.jpeg,Argollas acero blanco flor.
 28,ARGOLLA TRIÁNGULO CRISTAL,Acero Dorado - Aros,5300.0,1,img/IMG_0121.jpeg,"Argolla acero dorado, triángulo cristal. "
+29,ARGOLLA CORAZÓN ,Acero Dorado - Aros,6000.0,1,img/IMG_0119.jpeg,"Argolla acero dorado, corazón cristal. "
