@@ -29,3 +29,4 @@ id,name,category,price,stock,image_path,description
 28,ARGOLLA TRIÁNGULO CRISTAL,Acero Dorado - Aros,5300.0,1,img/IMG_0121.jpeg,"Argolla acero dorado, triángulo cristal. "
 29,ARGOLLA CORAZÓN ,Acero Dorado - Aros,6000.0,1,img/IMG_0119.jpeg,"Argolla acero dorado, corazón cristal. "
 30,PLUMAS STRASS COLOR,Acero Blanco - Aros,5000.0,1,img/IMG_0117.jpeg,"Acero blanco, plumas strass. "
+31,ARGOLLA CORAZÓN STRASS,Acero Dorado - Aros,8000.0,1,img/IMG_0114.jpeg,"Argolla acero dorado, corazón strass."
