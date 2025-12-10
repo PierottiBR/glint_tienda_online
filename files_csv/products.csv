@@ -40,3 +40,4 @@ id,name,category,price,stock,image_path,description
 39,ESTRELLAS ,Acero Blanco - Aros,3000.0,1,img/IMG_0389.jpeg,"Aros pasantes, acero blanco. "
 40,TRÉBOL STRASS ,Acero Blanco - Aros,4000.0,1,img/IMG_0388.jpeg,"Aros pasantes, acero blanco con strass."
 41,FLOR STRASS ,Acero Dorado - Aros,1000.0,0,,
+42,CANDADO ,Acero Dorado - Aros,4000.0,1,img/IMG_0383.jpeg,"Aros pasantes, acero dorado con strass. "
