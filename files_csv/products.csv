@@ -46,3 +46,4 @@ id,name,category,price,stock,image_path,description
 46,ALAS ,Acero Blanco - Aros,3000.0,1,img/IMG_0371.jpeg,"Aros pasantes, acero blanco. "
 47,GOTAS STRASS ,Acero Dorado - Aros,4000.0,1,img/IMG_0370.jpeg,"Aros pasantes, acero dorado con strass. "
 48,GATITOS STRASS ,Acero Dorado - Aros,4000.0,1,img/IMG_0368.jpeg,"Aros pasantes, acero dorado con strass."
+49,GATITOS STRASS ,Acero Blanco - Aros,4000.0,1,img/IMG_0362.jpeg,"Aros pasantes, acero blanco con strass. "
