@@ -34,3 +34,4 @@ id,name,category,price,stock,image_path,description
 33,STRASS CUBO ,Acero Blanco - Aros,8500.0,1,img/IMG_0159.jpeg,"Acero blanco, strass color. "
 34,ARGOLLA STRAS ,Acero Blanco - Aros,6500.0,1,img/IMG_0161.jpeg,"Argolla acero blanco, con strass."
 35,FLOR PASANTE,Acero Blanco - Aros,5500.0,1,img/IMG_0067.jpeg,Aros pasantes acero blanco. 
+36,GOTAS PERLAS ,Acero Dorado - Aros,3000.0,1,img/IMG_0399.jpeg,"Aros pasantes, acero dorado con perlas. "
