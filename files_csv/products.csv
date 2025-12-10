@@ -60,3 +60,4 @@ id,name,category,price,stock,image_path,description
 60, LOVE ,Acero Dorado - Aros,4000.0,1,img/IMG_0339.jpeg,"Argollas acero dorado, con corazones en relieve. "
 61,CRYSTAL GOLD,Acero Dorado - Aros,8500.0,1,img/IMG_0345.jpeg,"Argollas acero dorado, con cristales. "
 62,CRYSTAL GOLD MIN ,Acero Dorado - Aros,8500.0,1,img/IMG_0326.jpeg,"Argolla acero dorado, con cristales. "
+63,ARGOLLA CON OJO TURCO ,Acero Blanco - Aros,4500.0,1,img/IMG_9981.jpeg,Argolla acero blanco con ojo turco strass. 
