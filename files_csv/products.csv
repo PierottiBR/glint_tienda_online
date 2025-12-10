@@ -56,3 +56,4 @@ id,name,category,price,stock,image_path,description
 56,PAÑUELOS SEDA ,Pañuelos,10000.0,4,img/IMG_9472.jpeg,"Pañuelos de seda 70 x 70 cm, consultar disponibilidad."
 57,ARGOLLAS STRASS GOLDEN ,Acero Dorado - Aros,7000.0,1,img/IMG_0311.jpeg,"Argolla acero dorado, strass. "
 58,GOLDEN TWIST ,Acero Dorado - Aros,5500.0,1,img/IMG_0351.jpeg,Argollas acero dorado.
+59,ESTRELLA GLAM ,Acero Dorado - Aros,7000.0,1,img/IMG_0344.jpeg,"Argollas estrella con strass, en acero dorado. "
