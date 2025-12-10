@@ -43,3 +43,4 @@ id,name,category,price,stock,image_path,description
 43,FLOR STRASS ,Acero Dorado - Aros,4000.0,1,img/IMG_0384.jpeg,"Aros pasantes, acero dorado con strass."
 44,FLOR CRISTAL ,Acero Blanco - Aros,4000.0,1,img/IMG_0378.jpeg,"Aros pasantes, acero blanco con cristal. "
 45,HUELLITAS ,Acero Dorado - Aros,4000.0,1,img/IMG_0376.jpeg,"Aros pasantes, acero dorado con strass."
+46,ALAS ,Acero Blanco - Aros,3000.0,1,img/IMG_0371.jpeg,"Aros pasantes, acero blanco. "
