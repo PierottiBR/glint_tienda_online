@@ -82,3 +82,4 @@ id,name,category,price,stock,image_path,description
 Consultar colores. "
 83,PAÑUELOS SEDA 70 x 70 ,Pañuelos,10000.0,3,img/IMG_9468.jpeg,"Pañuelos de seda, consultar disponibilidad."
 84,PAÑUELOS SEDA 90 x 90 ,Pañuelos,12500.0,3,img/IMG_9460.jpeg,"Pañuelos de seda, consultar disponibilidad."
+85,PAÑUELOS DE SEDA 90 x 90 ,Pañuelos,12500.0,3,img/IMG_9466.jpeg,"Pañuelos de seda, consultar disponibilidad."
