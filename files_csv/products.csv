@@ -79,3 +79,5 @@ id,name,category,price,stock,image_path,description
 79,PULSERA PERLAS ,Acero Dorado - Pulseras,4500.0,1,img/IMG_7977.jpeg,Pulsera perlas. 
 80,GARGANTILLA ,Acero Dorado - Collares,12500.0,1,img/IMG_0442.jpeg,Gargantilla acero dorado. 
 81,PULSERA DIJES ,Acero Blanco - Pulseras,7000.0,1,img/IMG_8030.jpeg,"Pulsera acero blanco, dijes. "
+82,PULSERA CRISTALES ,Acero Quirúrgico - Aros,4000.0,3,img/IMG_9294.jpeg,"Pulseras corazón cristal, acero quirúrgico. 
+Consultar colores. "
