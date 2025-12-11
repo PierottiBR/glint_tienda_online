@@ -68,3 +68,4 @@ id,name,category,price,stock,image_path,description
 68,ALAS CRYSTAL ,Acero Dorado - Aros,4500.0,1,img/IMG_9968.jpeg,"Argolla acero dorado, cristal. "
 69,HUGGIES CRYSTAL ,Acero Blanco - Aros,9500.0,1,img/IMG_0331.jpeg,"Aros acero blanco, cristal. "
 70,HUGGIES CRISTAL NIGHT ,Acero Blanco - Aros,8500.0,1,img/IMG_0322.jpeg,"Aros acero blanco, cristal. "
+71,MINI HUGGIES ,Acero Blanco - Aros,4000.0,1,img/IMG_0353.jpeg,"Aros acero blanco, mini cristal. "
