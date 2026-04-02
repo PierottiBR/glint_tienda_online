@@ -17,3 +17,4 @@ id,name,category,price,stock,image_path,description
 16,PIEDRAS CORAZÓN COLOR,Acero Dorado - Anillos,5500.0,10,img/IMG_4630.jpeg,Disponibles en varios tamaños y colores. 
 17,ANILLO COLOR STRASS,Acero Blanco - Anillos,8000.0,1,img/IMG_4642.jpeg,"Anillo acero dorado, súper color strass."
 18,FLOR PIEDRA AZUL,Acero Blanco - Anillos,5500.0,1,img/IMG_4639.jpeg,"Anillo acero dorado regulable, con piedra azul."
+19,ANILLO FLOR BLANCA,Acero Blanco - Anillos,5500.0,1,img/IMG_4635.jpeg,Anillo acero dorado regulable.
