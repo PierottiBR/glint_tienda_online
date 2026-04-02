@@ -24,3 +24,4 @@ id,name,category,price,stock,image_path,description
 23,ANILLO PIEDRA ,Acero Blanco - Anillos,6500.0,1,img/IMG_4618.jpeg,"Anillo acero blanco, con piedra. "
 24,THE STAR ,Acero Dorado - Collares,9500.0,1,img/IMG_4010.jpeg,"Cadena acero dorado, con dije carta The Star."
 25,MANOS PARA COMPARTIR ,Acero Blanco - Collares,13500.0,1,img/IMG_4019.jpeg,"Conjuntos de dos cadenas, dijes manos."
+26,CHOKER STRASS,STRASS - Collar,9500.0,4,img/IMG_3987.jpeg,"Choker strass, consultar colores disponibles. "
