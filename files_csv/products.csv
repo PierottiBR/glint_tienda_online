@@ -49,3 +49,4 @@ id,name,category,price,stock,image_path,description
 49,MOÑO I,Acero Dorado - Aros,3000.0,1,img/IMG_4786.JPEG,Aros acero dorado.
 50,AROS PERLA DORADA,Acero Blanco - Aros,3500.0,1,img/IMG_4787.JPEG,Aros acero dorado.
 51,AROS MARIPOSA STRASS,Acero Blanco - Aros,4000.0,1,img/IMG_4788.JPEG,"Aros acero dorado, mariposa con strass."
+52,ARO MARIPOSA GEMA,Acero Dorado - Aros,4500.0,1,img/IMG_4791.JPEG,"Aros acero dorado, mariposa gema."
